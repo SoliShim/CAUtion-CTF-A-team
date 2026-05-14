@@ -1,198 +1,97 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTF Challenge Platform</title>
+    <title>Admin Portal</title>
     <style>
-        /* [팀원 1 담당] 전역 CSS 및 디자인 시스템 설정 */
-        :root {
-            --bg-color: #0f172a;
-            --text-color: #e2e8f0;
-            --accent-color: #10b981; /* 해커 톤의 네온 그린 */
-            --card-bg: #1e293b;
-            --border-color: #334155;
-        }
-
         body {
-            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* [팀원 2 담당] 헤더 및 네비게이션 바 */
-        header {
-            background-color: #020617;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            border-bottom: 2px solid var(--accent-color);
-        }
-
-        header h1 {
+            height: 100vh;
             margin: 0;
-            font-size: 1.5rem;
-            color: var(--accent-color);
         }
-
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            margin-left: 1.5rem;
-            font-weight: bold;
-            transition: color 0.3s;
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            width: 350px;
         }
-
-        nav a:hover {
-            color: var(--accent-color);
-        }
-
-        /* 메인 레이아웃 */
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .section-title {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* [팀원 3 담당] 문제 목록 (그리드 레이아웃) */
-        .challenge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .challenge-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .challenge-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-            border-color: var(--accent-color);
-        }
-
-        .category-badge {
-            display: inline-block;
-            background-color: #334155;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-        }
-
-        /* [팀원 4 담당] 모달 창 및 상호작용 UI (플래그 제출 등) */
-        .btn-submit {
-            background-color: transparent;
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--accent-color);
-            color: #000;
-        }
-
-        /* [팀원 5 담당] 푸터 및 부가 정보 */
-        footer {
-            background-color: #020617;
+        .title-box {
             text-align: center;
-            padding: 1rem;
-            font-size: 0.9rem;
-            color: #94a3b8;
-            border-top: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dfe6e9;
+            border-radius: 6px;
+            color: #2d3436;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
 <body>
-
-    <!-- 팀원 2: 상단 네비게이션 바 작업 영역 -->
-    <header>
-        <h1>[ CTF_PLATFORM ]</h1>
-        <nav>
-            <a href="#challenges">Challenges</a>
-            <a href="#scoreboard">Scoreboard</a>
-            <a href="#rules">Rules</a>
-            <a href="#profile">My Profile</a>
-        </nav>
-    </header>
-
-    <main>
-        <h2 class="section-title" id="challenges">Active Challenges</h2>
-        
-        <!-- 팀원 3: 문제 카드 데이터 바인딩 및 동적 생성 영역 -->
-        <div class="challenge-grid">
-            
-            <!-- 문제 카드 1 -->
-            <div class="challenge-card">
-                <span class="category-badge">Web</span>
-                <h3>Ping Test Service</h3>
-                <p>단순한 Ping 테스트 도구입니다. 하지만 입력값을 제대로 검증하고 있을까요?</p>
-                <p><strong>Points:</strong> 150</p>
-                <!-- 팀원 4: 플래그 제출 입력 폼 및 모달 연결 영역 -->
-                <button class="btn-submit">View Challenge</button>
-            </div>
-
-            <!-- 문제 카드 2 -->
-            <div class="challenge-card">
-                <span class="category-badge">Reversing</span>
-                <h3>License Checker</h3>
-                <p>제공된 바이너리를 분석하여 숨겨진 라이선스 키를 찾아내세요.</p>
-                <p><strong>Points:</strong> 200</p>
-                <button class="btn-submit">View Challenge</button>
-            </div>
-
-            <!-- 문제 카드 3 -->
-            <div class="challenge-card">
-                <span class="category-badge">System</span>
-                <h3>Context Switcher</h3>
-                <p>스케줄링 알고리즘의 취약점을 이용해 권한을 상승시키세요.</p>
-                <p><strong>Points:</strong> 350</p>
-                <button class="btn-submit">View Challenge</button>
-            </div>
-
-            <!-- 문제 카드 4 -->
-            <div class="challenge-card">
-                <span class="category-badge">Crypto</span>
-                <h3>Lost Keys</h3>
-                <p>암호화된 통신 패킷이 가로채졌습니다. 원본 메시지를 복구할 수 있나요?</p>
-                <p><strong>Points:</strong> 100</p>
-                <button class="btn-submit">View Challenge</button>
-            </div>
-
+    <div class="login-container">
+        <div class="title-box">
+            <h2>Admin Portal</h2>
+            <p class="subtitle">Secure Login</p>
         </div>
-    </main>
-
-    <!-- 팀원 5: 하단 푸터 및 팀 정보 영역 -->
-    <footer>
-        <p>&copy; 2026 CTF Project Team. All rights reserved.</p>
-        <p>Built for educational purposes.</p>
-    </footer>
-
+        <form method="POST" action="/">
+            <label for="userid">ID</label>
+            <input type="text" id="userid" name="userid" required autocomplete="off">
+            
+            <label for="userpassword">Password</label>
+            <input type="password" id="userpassword" name="userpassword" required>
+            
+            <button type="submit">LOGIN</button>
+        </form>
+    </div>
 </body>
 </html>
