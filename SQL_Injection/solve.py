@@ -29,7 +29,7 @@ while True:
         response = requests.post(url, data=data)
 
         # 응답 화면에 'hello admin'이 있다면 (참이라면) 글자를 찾은 것!
-        if "hello admin" in response.text:
+        if "Hello, admin" in response.text:
             flag += char
             print(f"[+] Pwned! 현재 플래그: {flag}")
             found = True
