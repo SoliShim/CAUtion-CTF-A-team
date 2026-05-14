@@ -42,33 +42,65 @@ def login():
     if request.method == 'GET':
         return render_template('index.html')
     
-    userid = request.form.get('userid', '')
-    userpassword = request.form.get('userpassword', '')
+    if request.method == 'POST':
+        userid = request.form.get('userid', '')
+        userpassword = request.form.get('userpassword', '')
 
-    # 입력값 필터링 검사
-    if not check_waf(userid) or not check_waf(userpassword):
-        return "No Hack! (WAF Detected)", 403
+        # WAF 검사 (실패 시 예쁜 경고 화면)
+        if not check_waf(userid) or not check_waf(userpassword):
+            return """
+            <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
+                <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #e74c3c;'>
+                    <h1 style='color:#e74c3c; margin-top:0;'>🛡️ WAF Detected!</h1>
+                    <p style='color:#7f8c8d; font-size:16px;'>No Hack! Malicious input blocked.</p>
+                    <button onclick='history.back()' style='margin-top:20px; padding:10px 20px; border:none; border-radius:6px; background:#e74c3c; color:white; cursor:pointer;'>Go Back</button>
+                </div>
+            </body>
+            """
 
-    try:
         conn = sqlite3.connect('sqli.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        
-        # 취약점이 터지는 쿼리문
-        query = f"SELECT * FROM user_table WHERE uid='{userid}' and upw='{userpassword}'"
-        cursor.execute(query)
-        result = cursor.fetchone()
-        conn.close()
 
-        # 로그인 결과 반환
-        if result:
-            return f"hello {result['uid']}"
-        else:
-            return "Login Failed..."
-            
-    except Exception as e:
-        return "Login Failed..."
+        try:
+            query = f"SELECT * FROM user_table WHERE uid='{userid}' and upw='{userpassword}'"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            conn.close()
+
+            if result:
+                # 로그인 성공 (예쁜 환영 화면)
+                return f"""
+                <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
+                    <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #2ecc71;'>
+                        <h1 style='color:#2ecc71; margin-top:0;'>🎉 Hello, {result['uid']}!</h1>
+                        <p style='color:#7f8c8d; font-size:16px;'>Welcome to the secret area.</p>
+                    </div>
+                </body>
+                """
+            else:
+                # 로그인 실패 (예쁜 에러 화면)
+                return """
+                <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
+                    <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #f39c12;'>
+                        <h1 style='color:#f39c12; margin-top:0;'>❌ Login Failed</h1>
+                        <p style='color:#7f8c8d; font-size:16px;'>Invalid username or password.</p>
+                        <button onclick='history.back()' style='margin-top:20px; padding:10px 20px; border:none; border-radius:6px; background:#f39c12; color:white; cursor:pointer;'>Try Again</button>
+                    </div>
+                </body>
+                """
+
+        except Exception as e:
+            # SQL 문법 에러 (마찬가지로 실패 화면)
+            return """
+            <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
+                <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #f39c12;'>
+                    <h1 style='color:#f39c12; margin-top:0;'>❌ Login Failed</h1>
+                    <p style='color:#7f8c8d; font-size:16px;'>An error occurred. Invalid input.</p>
+                    <button onclick='history.back()' style='margin-top:20px; padding:10px 20px; border:none; border-radius:6px; background:#f39c12; color:white; cursor:pointer;'>Try Again</button>
+                </div>
+            </body>
+            """
 
 if __name__ == '__main__':
-    # 주어진 Dockerfile의 EXPOSE 80에 맞춰 포트 변경
     app.run(host='0.0.0.0', port=5000)
