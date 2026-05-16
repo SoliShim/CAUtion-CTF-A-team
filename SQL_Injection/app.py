@@ -24,18 +24,19 @@ init_db()
 
 # 🔥 [핵심] WAF (웹 방화벽) 로직
 def check_waf(input_str):
-    # 1. VIP 프리패스: 완벽한 정답 플래그가 들어오면 무사 통과!
+    # 1. VIP 프리패스
     if input_str == REAL_FLAG:
-        return True
+        return True, "Pass"
 
-    # 2. 일반 검사: 띄어쓰기 차단
+    # 2. 공백 검사
     if ' ' in input_str:
-        return False
-    # 3. 일반 검사: substr 차단
-    if 'substr' in input_str.lower():
-        return False
+        return False, "공백(Space)은 사용할 수 없습니다."
         
-    return True
+    # 3. substr 검사
+    if 'substr' in input_str.lower():
+        return False, "'substr' 함수는 사용할 수 없습니다."
+        
+    return True, "Pass"
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -46,13 +47,21 @@ def login():
         userid = request.form.get('userid', '')
         userpassword = request.form.get('userpassword', '')
 
-        # WAF 검사 (실패 시 예쁜 경고 화면)
-        if not check_waf(userid) or not check_waf(userpassword):
-            return """
+        # WAF 검사 (결과와 차단 사유를 같이 받아옵니다)
+        id_pass, id_msg = check_waf(userid)
+        pw_pass, pw_msg = check_waf(userpassword)
+
+        # 둘 중 하나라도 방화벽에 걸렸다면?
+        if not id_pass or not pw_pass:
+            # 실패 사유 결정 (아이디가 걸렸으면 아이디 사유를, 아니면 비밀번호 사유를 띄움)
+            error_message = id_msg if not id_pass else pw_msg
+            
+            # 실패 창에 error_message 변수를 쏙 집어넣습니다!
+            return f"""
             <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
                 <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #e74c3c;'>
                     <h1 style='color:#e74c3c; margin-top:0;'>🛡️ WAF Detected!</h1>
-                    <p style='color:#7f8c8d; font-size:16px;'>No Hack! Malicious input blocked.</p>
+                    <p style='color:#333; font-size:18px; font-weight:bold;'>{error_message}</p>
                     <button onclick='history.back()' style='margin-top:20px; padding:10px 20px; border:none; border-radius:6px; background:#e74c3c; color:white; cursor:pointer;'>Go Back</button>
                 </div>
             </body>
@@ -69,7 +78,7 @@ def login():
             conn.close()
 
             if result:
-                # 로그인 성공 (예쁜 환영 화면)
+                # 로그인 성공 화면
                 return f"""
                 <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
                     <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #2ecc71;'>
@@ -79,7 +88,7 @@ def login():
                 </body>
                 """
             else:
-                # 로그인 실패 (예쁜 에러 화면)
+                # 일반 로그인 실패 화면 (DB에 없는 정보)
                 return """
                 <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
                     <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #f39c12;'>
@@ -91,12 +100,12 @@ def login():
                 """
 
         except Exception as e:
-            # SQL 문법 에러 (마찬가지로 실패 화면)
+            # SQL 문법 에러 화면
             return """
             <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;'>
                 <div style='text-align:center; padding:40px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08); border-top: 5px solid #f39c12;'>
                     <h1 style='color:#f39c12; margin-top:0;'>❌ Login Failed</h1>
-                    <p style='color:#7f8c8d; font-size:16px;'>An error occurred. Invalid input.</p>
+                    <p style='color:#7f8c8d; font-size:16px;'>An error occurred. Invalid SQL syntax.</p>
                     <button onclick='history.back()' style='margin-top:20px; padding:10px 20px; border:none; border-radius:6px; background:#f39c12; color:white; cursor:pointer;'>Try Again</button>
                 </div>
             </body>
