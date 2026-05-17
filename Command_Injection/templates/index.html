@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Injection Challenge</title>
+    <style>
+        body {
+            background: #f3f6f8;
+            color: #263238;
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shell {
+            width: min(760px, calc(100% - 32px));
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(35, 55, 70, 0.12);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #243746;
+            color: #ffffff;
+            padding: 24px 28px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0 0 6px;
+            letter-spacing: 0;
+        }
+
+        .header p {
+            color: #c8d4dd;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 28px;
+        }
+
+        .challenge-label {
+            color: #d35400;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            border: 1px solid #ccd6dd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            color: #263238;
+            font-size: 15px;
+            padding: 12px;
+        }
+
+        button {
+            background: #243746;
+            border: 0;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 0 18px;
+        }
+
+        button:hover {
+            background: #182632;
+        }
+
+        .hint {
+            color: #60717d;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        .panel {
+            background: #f7fafc;
+            border: 1px solid #dce5eb;
+            border-radius: 8px;
+            margin-top: 22px;
+            padding: 16px;
+        }
+
+        .panel-title {
+            color: #4b5d68;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        pre {
+            background: #17212b;
+            border-radius: 6px;
+            color: #d7e2ea;
+            font-size: 14px;
+            line-height: 1.45;
+            margin: 0;
+            max-height: 280px;
+            overflow: auto;
+            padding: 14px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .error {
+            background: #fff3f0;
+            border: 1px solid #ffd0c7;
+            border-radius: 8px;
+            color: #c0392b;
+            font-weight: 700;
+            margin-top: 18px;
+            padding: 14px 16px;
+        }
+
+        @media (max-width: 560px) {
+            .form-row {
+                flex-direction: column;
+            }
+
+            button {
+                min-height: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="header">
+            <h1>Admin Report Inspector</h1>
+            <p>Internal tool for checking report files on the server.</p>
+        </section>
+
+        <section class="content">
+            <div class="challenge-label">[ Command Injection Challenge ]</div>
+
+            <form method="POST" action="/">
+                <label for="filename">Report file name</label>
+                <div class="form-row">
+                    <input type="text" id="filename" name="filename" value="{{ filename }}" autocomplete="off" placeholder="notice.txt" required>
+                    <button type="submit">Inspect</button>
+                </div>
+            </form>
+
+            <p class="hint">Available files: notice.txt, health.log, backup.log, result.txt. Spaces, parent directory movement, and cat are blocked.</p>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            {% if status %}
+            <div class="panel">
+                <div class="panel-title">Status</div>
+                <pre>{{ status }}</pre>
+            </div>
+            {% endif %}
+
+            {% if result %}
+            <div class="panel">
+                <div class="panel-title">Result</div>
+                <pre>{{ result }}</pre>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
