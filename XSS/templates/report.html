@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>관리자 검토 요청</title>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">REPORT</span>
+
+    <h1>관리자 검토 요청</h1>
+
+    <div class="notice">
+      접수된 문의는 개인정보 보호 담당자(DPO)가 검토합니다.
+    </div>
+
+    <div class="card">
+
+      <form method="POST">
+
+        <p>
+
+          <label>
+            <strong>문의 번호</strong>
+          </label>
+
+          <br><br>
+
+          <input type="text"
+                 name="ticket_id"
+                 placeholder="예: 1"
+                 required>
+
+        </p>
+
+        <button type="submit">
+          관리자에게 제출
+        </button>
+
+      </form>
+
+    </div>
+
+    <p>
+      <a href="/">메인으로</a>
+    </p>
+
+  </div>
+
+</body>
+</html>

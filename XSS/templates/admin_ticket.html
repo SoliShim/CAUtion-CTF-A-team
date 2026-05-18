@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>관리자 문의 검토</title>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">ADMIN</span>
+
+    <h1>관리자 문의 검토 페이지</h1>
+
+    <div class="card">
+
+      <p><strong>문의 번호:</strong> {{ ticket.id }}</p>
+
+      <p><strong>제목:</strong> {{ ticket.title }}</p>
+
+    </div>
+
+    <h3>문의 내용</h3>
+
+    <div class="card">
+
+      {{ ticket.content | safe }}
+
+    </div>
+
+    <!-- DPO note: masked data can be reviewed in /admin/audit -->
+
+  </div>
+
+</body>
+</html>

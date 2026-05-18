@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>Privacy Auditor</title>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">Privacy Auditor</span>
+
+    <h1>개인정보 접속기록 감사 시스템</h1>
+
+    <p>
+      개인정보 정정 및 삭제 요청을 접수하고,
+      내부 감사 담당자가 검토하는 시스템입니다.
+    </p>
+
+    <div class="notice">
+
+      민감정보는 기본적으로 마스킹 처리되며,
+      내부 검토 프로세스를 통해서만 원본 조회가 가능합니다.
+
+    </div>
+
+    <div class="card">
+
+      <p>
+        <a class="btn" href="/request">
+          문의 작성하기
+        </a>
+      </p>
+
+      <p>
+        <a href="/report">
+          관리자 검토 요청하기
+        </a>
+      </p>
+
+      <p>
+        <a href="/flag">
+          Flag 제출하기
+        </a>
+      </p>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
