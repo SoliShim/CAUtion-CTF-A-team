@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>개인정보 접속기록 감사</title>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">ADMIN AUDIT</span>
+
+    <h1>개인정보 접속기록 감사 시스템</h1>
+
+    <div class="notice">
+      관리자 권한으로만 접근 가능한 내부 감사 페이지입니다.
+    </div>
+
+    <input type="hidden"
+           id="csrf_token"
+           value="{{ csrf_token }}">
+
+    <h3>마스킹된 개인정보</h3>
+
+    <table>
+
+      <tr>
+        <th>target_id</th>
+        <td>1004</td>
+      </tr>
+
+      <tr>
+        <th>이름</th>
+        <td>김민수</td>
+      </tr>
+
+      <tr>
+        <th>전화번호</th>
+        <td>010-****-1234</td>
+      </tr>
+
+      <tr>
+        <th>이메일</th>
+        <td>k***@example.com</td>
+      </tr>
+
+      <tr>
+        <th>처리 사유</th>
+        <td>개인정보 정정 요청 검토</td>
+      </tr>
+
+    </table>
+
+    <div class="card">
+
+      <p>
+        <strong>보안 정책</strong>
+      </p>
+
+      <p>
+        민감정보는 기본적으로 마스킹 처리되며,
+        내부 검토 프로세스를 통해서만 원본 조회가 가능합니다.
+      </p>
+
+    </div>
+
+    <!-- unmask endpoint: /api/unmask?target_id=1004&csrf_token=... -->
+
+  </div>
+
+</body>
+</html>
