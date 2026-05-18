@@ -14,3 +14,5 @@ ID는 admin이며 비밀번호가 이 문제의 플래그입니다.
 docker build -t blind-sqli .
 docker run -d -p 80:80 blind-sqli
 ```
+
+문제의 주소는 http://localhost 입니다.
