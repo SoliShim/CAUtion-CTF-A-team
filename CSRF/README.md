@@ -15,6 +15,7 @@ docker build -t csrf-challenge .
 docker run -d -p 8000:8000 csrf-challenge
 ```
 ## 디렉터리 구성
+```
 CSRF/
 ├── Dockerfile          # Python 3.11 + Chromium + ChromeDriver 환경 구성
 ├── app.py              # Flask 애플리케이션 (CSRF 취약점 포함)
@@ -30,6 +31,7 @@ CSRF/
     ├── transfer.html   # 코인 송금 페이지 (CSRF 토큰 보호)
     ├── flag.html       # admin 봇에게 URL 전달
     └── rank.html       # 사용자 코인 랭킹
+```
 ## 사용 기술
 * Backend: Python 3.11, Flask
 * Admin Bot: Selenium + Chromium (Headless)
