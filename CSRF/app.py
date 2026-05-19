@@ -193,7 +193,7 @@ def shop():
     username = login_required()
 
     if username is None:
-        return render_template("index.html", text="please login")
+        return render_template("shop.html", price=FLAG_PRICE, text="please login")
 
     if request.method == "GET":
         return render_template("shop.html", price=FLAG_PRICE)
@@ -215,7 +215,7 @@ def earn():
     username = login_required()
 
     if username is None:
-        return render_template("index.html", text="please login")
+        return render_template("earn.html", text="please login")
 
     session_id = request.cookies.get("sessionid")
     message = None
@@ -273,7 +273,7 @@ def transfer():
         username = session_storage[session_id]
         csrf_token = token_storage[session_id]
     except KeyError:
-        return render_template('index.html', text='please login')
+        return render_template('transfer.html', text='please login')
     if request.method == 'GET':
         return render_template("transfer.html", csrf_token=csrf_token)
     elif request.method == 'POST':

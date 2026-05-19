@@ -1,13 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Earn · CoinTrade{% endblock %}
+{% block title %}Earn · CSRFBank{% endblock %}
 {% block content %}
 <div class="card">
-    <h1>Earn</h1>
-    <p class="muted">수학 문제의 정답을 맞히면 1코인을 획득합니다. 매번 새로운 문제가 출제됩니다.</p>
+    <h1>게임</h1>
+
+    {% if text %}
+    <div class="alert alert-error">{{ text }}</div>
+    {% endif %}
 
     {% if message %}
     <div class="alert alert-{{ message[0] }}">{{ message[1] }}</div>
     {% endif %}
+
+    {% if current_user %}
+    <p class="muted">심심하신가요? 수학 문제를 풀고 돈을 벌어보세요</p>
 
     <div class="problem">
         {{ problem.a }} {{ problem.op }} {{ problem.b }} = ?
@@ -20,5 +26,6 @@
         </div>
         <button type="submit">제출하기</button>
     </form>
+    {% endif %}
 </div>
 {% endblock %}

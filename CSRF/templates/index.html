@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}CoinTrade{% endblock %}
+{% block title %}CSRFBank{% endblock %}
 {% block content %}
 <div class="hero">
-    <h1>CoinTrade</h1>
+    <h1>CSRFBank</h1>
     <p>코인을 모으고, 거래하고, 특별한 보상을 만나보세요.</p>
 </div>
 
@@ -11,21 +11,21 @@
 {% endif %}
 
 <div class="card-grid">
-    <a class="feature-card" href="{{ url_for('earn') }}">
-        <h3>Earn</h3>
-        <p>간단한 수학 문제를 풀고 코인을 모아보세요.</p>
-    </a>
     <a class="feature-card" href="{{ url_for('shop') }}">
-        <h3>Shop</h3>
-        <p>모은 코인으로 특별한 아이템을 구매하세요.</p>
+        <h3>상점</h3>
+        <p>특별한 상품이 판매 중입니다</p>
+    </a>
+    <a class="feature-card" href="{{ url_for('earn') }}">
+        <h3>심심하신가요?</h3>
+        <p>수학 문제를 풀어보세요</p>
     </a>
     <a class="feature-card" href="{{ url_for('transfer') }}">
-        <h3>Transfer</h3>
-        <p>다른 사용자에게 코인을 전송할 수 있습니다.</p>
+        <h3>돈이 많으신가요?</h3>
+        <p>다른 사용자에게 선물해보세요</p>
     </a>
     <a class="feature-card" href="{{ url_for('rank') }}">
-        <h3>Rank</h3>
-        <p>전체 사용자 랭킹을 확인하세요.</p>
+        <h3>랭킹</h3>
+        <p>누가 돈이 많은지 확인해보세요</p>
     </a>
 </div>
 {% endblock %}
