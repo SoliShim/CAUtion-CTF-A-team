@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Shop · CoinTrade{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>상점</h1>
+    <p class="muted">코인으로 특별한 보상을 구매할 수 있습니다.</p>
+
+    {% if text %}
+    <div class="alert alert-error">{{ text }}</div>
+    {% endif %}
+
+    <div class="item">
+        <div class="item-info">
+            <h2>플래그</h2>
+            <p>이 상점에서 가장 특별한 아이템입니다.</p>
+            <div class="price">{{ "{:,}".format(price) }}원</div>
+        </div>
+        <form method="post" action="{{ url_for('shop') }}">
+            <button type="submit">구매하기</button>
+        </form>
+    </div>
+
+    {% if flag %}
+    <div class="flag-display">
+        <div class="label">플래그를 획득했습니다.</div>
+        <div class="flag-text">{{ flag }}</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

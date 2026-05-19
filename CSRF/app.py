@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service
 from hashlib import md5
 import urllib
 import os
+import random
 
 import secrets
 
@@ -50,6 +51,20 @@ users = {
 
 session_storage = {}
 token_storage = {}
+problem_storage = {}
+
+
+def generate_problem():
+    a = random.randint(1, 50)
+    b = random.randint(1, 50)
+    op = random.choice(["+", "-", "*"])
+    if op == "+":
+        answer = a + b
+    elif op == "-":
+        answer = a - b
+    else:
+        answer = a * b
+    return {"a": a, "b": b, "op": op, "answer": answer}
 
 def read_url(url, cookie={"name": "name", "value": "value"}):
     cookie.update({"domain": "127.0.0.1"})
@@ -115,9 +130,28 @@ def login_required():
     return username
 
 
+@app.context_processor
+def inject_user():
+    username = get_username()
+    coin = users[username]["coin"] if username and username in users else None
+    return {"current_user": username, "current_coin": coin}
+
+
 @app.route("/")
 def index():
     return render_template('index.html')
+
+
+@app.route("/logout")
+def logout():
+    session_id = request.cookies.get("sessionid")
+    if session_id:
+        session_storage.pop(session_id, None)
+        token_storage.pop(session_id, None)
+        problem_storage.pop(session_id, None)
+    resp = make_response(redirect(url_for("index")))
+    resp.set_cookie("sessionid", "", expires=0)
+    return resp
 
 @app.route("/vuln")
 def vuln():
@@ -154,7 +188,7 @@ def login():
         
         return '<script>alert("wrong password");history.go(-1);</script>'
 
-@app.route("/shop")
+@app.route("/shop", methods=["GET", "POST"])
 def shop():
     username = login_required()
 
@@ -173,17 +207,42 @@ def shop():
 
     users[username]["coin"] -= FLAG_PRICE
 
-    return render_template("shop.html", price=FLAG_PRICE, text=FLAG)
+    return render_template("shop.html", price=FLAG_PRICE, flag=FLAG)
 
 
-@app.route("/earn")
+@app.route("/earn", methods=["GET", "POST"])
 def earn():
     username = login_required()
 
     if username is None:
         return render_template("index.html", text="please login")
 
-    return render_template("earn.html")
+    session_id = request.cookies.get("sessionid")
+    message = None
+
+    if request.method == "POST":
+        try:
+            user_answer = int(request.form.get("answer", ""))
+        except ValueError:
+            user_answer = None
+
+        current = problem_storage.get(session_id)
+        if current is None:
+            current = generate_problem()
+
+        if user_answer == current["answer"]:
+            users[username]["coin"] += 1
+            message = ("success", "정답입니다! +1 코인")
+        else:
+            message = ("error", f"오답입니다. 정답은 {current['answer']} 였습니다.")
+
+        problem_storage[session_id] = generate_problem()
+    else:
+        if session_id not in problem_storage:
+            problem_storage[session_id] = generate_problem()
+
+    problem = problem_storage[session_id]
+    return render_template("earn.html", problem=problem, message=message)
 
 
 @app.route("/rank")
@@ -205,7 +264,7 @@ def rank():
                 "coin": data["coin"],
             }
         )
-        return render_template("rank.html", ranking=ranking_data)
+    return render_template("rank.html", ranking=ranking_data)
     
 @app.route("/transfer", methods=["GET", "POST"])
 def transfer():

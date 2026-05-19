@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Earn · CoinTrade{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Earn</h1>
+    <p class="muted">수학 문제의 정답을 맞히면 1코인을 획득합니다. 매번 새로운 문제가 출제됩니다.</p>
+
+    {% if message %}
+    <div class="alert alert-{{ message[0] }}">{{ message[1] }}</div>
+    {% endif %}
+
+    <div class="problem">
+        {{ problem.a }} {{ problem.op }} {{ problem.b }} = ?
+    </div>
+
+    <form method="post" action="{{ url_for('earn') }}">
+        <div class="form-group">
+            <label for="answer">정답</label>
+            <input type="number" id="answer" name="answer" required autofocus>
+        </div>
+        <button type="submit">제출하기</button>
+    </form>
+</div>
+{% endblock %}
