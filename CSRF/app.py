@@ -27,27 +27,27 @@ except:
 users = {
     "admin": {
         "password": secrets.token_hex(16),
-        "coin": 4_294_967_295,
+        "money": 4_294_967_295,
     },
     "bdmin": {
         "password": "bdmin123",
-        "coin": 65_535,
+        "money": 65_535,
     },
     "cdmin": {
         "password": "cdmin123",
-        "coin": 32_767,
+        "money": 32_767,
     },
     "ddmin": {
         "password": "ddmin123",
-        "coin": 255,
+        "money": 255,
     },
     "edmin": {
         "password": "edmin123",
-        "coin": 127,
+        "money": 127,
     },
     "guest": {
         "password": "guest",
-        "coin": 0,
+        "money": 0,
     },
 }
 
@@ -55,6 +55,7 @@ session_storage = {}
 token_storage = {}
 problem_storage = {}
 purchased_users = set()
+flag_in_flight = set()
 
 
 def generate_problem():
@@ -149,8 +150,8 @@ def login_required():
 @app.context_processor
 def inject_user():
     username = get_username()
-    coin = users[username]["coin"] if username and username in users else None
-    return {"current_user": username, "current_coin": coin}
+    money = users[username]["money"] if username and username in users else None
+    return {"current_user": username, "current_money": money}
 
 
 @app.route("/")
@@ -178,14 +179,21 @@ def flag():
     if request.method == "GET":
         return render_template("flag.html")
     elif request.method == "POST":
-        param = request.form.get("param", "")
+        session_id = request.cookies.get("sessionid") or request.remote_addr
+        if session_id in flag_in_flight:
+            return render_template("flag.html", message=("error", "이전 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."))
+        flag_in_flight.add(session_id)
         try:
-            result = check_csrf(param)
-        except Exception:
-            result = False
-        if not result:
-            return render_template("flag.html", message=("error", "잘못된 payload입니다."))
-        return render_template("flag.html", message=("success", "payload가 전송되었습니다."))
+            param = request.form.get("param", "")
+            try:
+                result = check_csrf(param)
+            except Exception:
+                result = False
+            if not result:
+                return render_template("flag.html", message=("error", "잘못된 payload입니다."))
+            return render_template("flag.html", message=("success", "payload가 전송되었습니다."))
+        finally:
+            flag_in_flight.discard(session_id)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -230,14 +238,14 @@ def shop():
             purchased=True,
         )
 
-    if users[username]["coin"] < FLAG_PRICE:
+    if users[username]["money"] < FLAG_PRICE:
         return render_template(
             "shop.html",
             price=FLAG_PRICE,
-            text="코인이 부족합니다.",
+            text="잔액이 부족합니다.",
         )
 
-    users[username]["coin"] -= FLAG_PRICE
+    users[username]["money"] -= FLAG_PRICE
     purchased_users.add(username)
 
     return render_template(
@@ -269,8 +277,8 @@ def game():
             current = generate_problem()
 
         if user_answer == current["answer"]:
-            users[username]["coin"] += 1
-            message = ("success", "정답입니다! +1 코인")
+            users[username]["money"] += 1
+            message = ("success", "정답입니다! +1원")
         else:
             message = ("error", f"오답입니다. 정답은 {current['answer']} 였습니다.")
 
@@ -287,7 +295,7 @@ def game():
 def rank():
     ranking = sorted(
         users.items(),
-        key=lambda item: item[1]["coin"],
+        key=lambda item: item[1]["money"],
         reverse=True
     )
 
@@ -299,7 +307,7 @@ def rank():
             {
                 "rank": i,
                 "username": username,
-                "coin": data["coin"],
+                "money": data["money"],
             }
         )
     return render_template("rank.html", ranking=ranking_data)
@@ -333,11 +341,11 @@ def transfer():
         if amount <= 0:
             return "invalid amount"
 
-        if users[username]["coin"] < amount:
-            return "not enough coin"
+        if users[username]["money"] < amount:
+            return "not enough money"
 
-        users[username]["coin"] -= amount
-        users[to]["coin"] += amount
+        users[username]["money"] -= amount
+        users[to]["money"] += amount
 
         return "transfer success"
         

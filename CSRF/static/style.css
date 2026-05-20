@@ -132,7 +132,7 @@ button {
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     margin-top: 24px;
 }
@@ -214,6 +214,11 @@ button,
 button:hover,
 .btn:hover {
     background: #1d4ed8;
+}
+
+button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
 }
 
 table {

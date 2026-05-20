@@ -20,7 +20,7 @@
             <div class="nav-right">
                 {% if current_user %}
                     <span class="user-name">{{ current_user }}</span>
-                    <span class="coin-badge">{{ "{:,}".format(current_coin) }}원</span>
+                    <span class="coin-badge">{{ "{:,}".format(current_money) }}원</span>
                     <a href="{{ url_for('logout') }}">로그아웃</a>
                 {% else %}
                     <a href="{{ url_for('login') }}">로그인</a>

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="hero">
     <h1>CSRFBank</h1>
-    <p>코인을 모으고, 거래하고, 특별한 보상을 만나보세요.</p>
+    <p>돈을 모으고, 거래하고, 특별한 보상을 만나보세요.</p>
 </div>
 
 {% if text %}
@@ -15,6 +15,10 @@
         <h3>상점</h3>
         <p>특별한 상품이 판매 중입니다</p>
     </a>
+    <a class="feature-card" href="{{ url_for('rank') }}">
+        <h3>랭킹</h3>
+        <p>누가 돈이 많은지 확인해보세요</p>
+    </a>
     <a class="feature-card" href="{{ url_for('game') }}">
         <h3>심심하신가요?</h3>
         <p>수학 문제를 풀어보세요</p>
@@ -22,10 +26,6 @@
     <a class="feature-card" href="{{ url_for('transfer') }}">
         <h3>돈이 많으신가요?</h3>
         <p>다른 사용자에게 선물해보세요</p>
-    </a>
-    <a class="feature-card" href="{{ url_for('rank') }}">
-        <h3>랭킹</h3>
-        <p>누가 돈이 많은지 확인해보세요</p>
     </a>
 </div>
 {% endblock %}
