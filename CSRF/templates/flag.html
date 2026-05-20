@@ -11,8 +11,10 @@
 
     <form method="post" action="{{ url_for('flag') }}" id="flag-form">
         <div class="form-group">
-            <label for="param">파라미터</label>
-            <input type="text" id="param" name="param" required>
+            <div class="url-input-row">
+                <span class="url-prefix">{{ base_url }}/vuln?param=</span>
+                <input type="text" id="param" name="param" required>
+            </div>
         </div>
         <button type="submit" id="flag-submit">전송하기</button>
     </form>

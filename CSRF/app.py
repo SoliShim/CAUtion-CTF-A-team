@@ -177,11 +177,11 @@ def vuln():
 @app.route("/flag", methods=["GET", "POST"])
 def flag():
     if request.method == "GET":
-        return render_template("flag.html")
+        return render_template("flag.html", base_url=BASE_URL)
     elif request.method == "POST":
         session_id = request.cookies.get("sessionid") or request.remote_addr
         if session_id in flag_in_flight:
-            return render_template("flag.html", message=("error", "이전 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."))
+            return render_template("flag.html", base_url=BASE_URL, message=("error", "이전 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."))
         flag_in_flight.add(session_id)
         try:
             param = request.form.get("param", "")
@@ -190,8 +190,8 @@ def flag():
             except Exception:
                 result = False
             if not result:
-                return render_template("flag.html", message=("error", "잘못된 payload입니다."))
-            return render_template("flag.html", message=("success", "payload가 전송되었습니다."))
+                return render_template("flag.html", base_url=BASE_URL, message=("error", "잘못된 payload입니다."))
+            return render_template("flag.html", base_url=BASE_URL, message=("success", "payload가 전송되었습니다."))
         finally:
             flag_in_flight.discard(session_id)
 
@@ -327,27 +327,30 @@ def transfer():
         to = request.form.get("to", "")
         amount_raw = request.form.get("amount", "0")
 
+        def err(msg):
+            return render_template("transfer.html", csrf_token=csrf_token, text=msg)
+
         if form_token != csrf_token:
-            return "invalid csrf token"
-        
+            return err("유효하지 않은 요청입니다.")
+
         if to not in users:
-            return "invalid user"
-        
+            return err("존재하지 않는 사용자입니다.")
+
         try:
             amount = int(amount_raw)
         except ValueError:
-            return "invalid amount"
-        
+            return err("금액이 올바르지 않습니다.")
+
         if amount <= 0:
-            return "invalid amount"
+            return err("금액은 1 이상이어야 합니다.")
 
         if users[username]["money"] < amount:
-            return "not enough money"
+            return err("잔액이 부족합니다.")
 
         users[username]["money"] -= amount
         users[to]["money"] += amount
 
-        return "transfer success"
+        return render_template("transfer.html", csrf_token=csrf_token, text_success="송금이 완료되었습니다.")
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT)

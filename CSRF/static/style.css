@@ -221,6 +221,31 @@ button:disabled {
     cursor: not-allowed;
 }
 
+.url-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.url-prefix {
+    padding: 10px 12px;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 13px;
+    white-space: nowrap;
+    border-right: 1px solid #d1d5db;
+}
+
+.url-input-row input {
+    border: none;
+    border-radius: 0;
+    flex: 1;
+    min-width: 0;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

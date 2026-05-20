@@ -4,6 +4,9 @@
 <div class="card">
     <h1>송금</h1>
 
+    {% if text_success %}
+    <div class="alert alert-success">{{ text_success }}</div>
+    {% endif %}
     {% if text %}
     <div class="alert alert-error">{{ text }}</div>
     {% endif %}
