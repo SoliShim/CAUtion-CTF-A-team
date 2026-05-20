@@ -14,9 +14,13 @@
             <h2>플래그</h2>
             <div class="price">{{ "{:,}".format(price) }}원</div>
         </div>
+        {% if purchased %}
+        <button type="button" disabled>구매 완료</button>
+        {% else %}
         <form method="post" action="{{ url_for('shop') }}">
             <button type="submit">구매하기</button>
         </form>
+        {% endif %}
     </div>
 
     {% if flag %}

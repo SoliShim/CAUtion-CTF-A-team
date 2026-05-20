@@ -2,6 +2,8 @@ from flask import Flask, request, render_template, make_response, redirect, url_
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 from hashlib import md5
 import urllib
 import os
@@ -52,6 +54,7 @@ users = {
 session_storage = {}
 token_storage = {}
 problem_storage = {}
+purchased_users = set()
 
 
 def generate_problem():
@@ -68,29 +71,42 @@ def generate_problem():
 
 def read_url(url, cookie={"name": "name", "value": "value"}):
     cookie.update({"domain": "127.0.0.1"})
-    service = Service(executable_path="/chromedriver")
+    service = Service(executable_path="/usr/bin/chromedriver")
     options = webdriver.ChromeOptions()
+    options.binary_location = "/usr/bin/chromium"
+    options.page_load_strategy = "eager"
     try:
         for _ in [
-            "headless",
-            "window-size=1920x1080",
+            "headless=new",
+            "window-size=1280x720",
             "disable-gpu",
             "no-sandbox",
             "disable-dev-shm-usage",
+            "disable-extensions",
+            "disable-images",
+            "blink-settings=imagesEnabled=false",
         ]:
             options.add_argument(_)
         driver = webdriver.Chrome(service=service, options=options)
-        driver.implicitly_wait(3)
-        driver.set_page_load_timeout(3)
-        driver.get("http://127.0.0.1:8000/login")
+        driver.set_page_load_timeout(10)
+
+        session_id = create_session("admin", "127.0.0.1")
+        driver.get("http://127.0.0.1:8000/")
         driver.add_cookie(cookie)
-        driver.find_element(by=By.NAME, value="username").send_keys("admin")
-        driver.find_element(by=By.NAME, value="password").send_keys(users["admin"])
-        driver.find_element(by=By.NAME, value="submit").click()
+        driver.add_cookie({"name": "sessionid", "value": session_id, "domain": "127.0.0.1"})
+
         driver.get(url)
+        current_url = driver.current_url
+        try:
+            WebDriverWait(driver, 5).until(lambda d: d.current_url != current_url)
+        except TimeoutException:
+            pass
     except Exception as e:
-        driver.quit()
-        # return str(e)
+        try:
+            driver.quit()
+        except Exception:
+            pass
+        print(f"[read_url] Exception: {type(e).__name__}: {e}", flush=True)
         return False
     driver.quit()
     return True
@@ -142,6 +158,24 @@ def index():
     return render_template('index.html')
 
 
+@app.route("/debug/token")
+def debug_token():
+    username = request.args.get("username", "admin")
+    remote_addr = request.remote_addr
+    computed = md5((username + remote_addr).encode()).hexdigest()
+    live_token = None
+    for session_id, name in session_storage.items():
+        if name == username:
+            live_token = token_storage.get(session_id)
+            break
+    return {
+        "username": username,
+        "remote_addr": remote_addr,
+        "computed_token": computed,
+        "live_token": live_token,
+    }
+
+
 @app.route("/logout")
 def logout():
     session_id = request.cookies.get("sessionid")
@@ -156,6 +190,7 @@ def logout():
 @app.route("/vuln")
 def vuln():
     param = request.args.get("param", "").lower()
+    print(f"[/vuln] remote_addr={request.remote_addr} cookies={dict(request.cookies)} param={param!r}", flush=True)
     return param
 
 @app.route("/flag", methods=["GET", "POST"])
@@ -164,10 +199,13 @@ def flag():
         return render_template("flag.html")
     elif request.method == "POST":
         param = request.form.get("param", "")
-        if not check_csrf(param):
-            return '<script>alert("wrong??");history.go(-1);</script>'
-
-        return '<script>alert("good");history.go(-1);</script>'
+        try:
+            result = check_csrf(param)
+        except Exception:
+            result = False
+        if not result:
+            return render_template("flag.html", message=("error", "잘못된 payload입니다."))
+        return render_template("flag.html", message=("success", "payload가 전송되었습니다."))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -176,16 +214,20 @@ def login():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        print(f"[/login] attempt user={username!r} pwd_len={len(password) if password else 0} remote_addr={request.remote_addr}", flush=True)
 
         if username not in users:
+            print(f"[/login] user not found: {username!r}", flush=True)
             return '<script>alert("user not found");history.go(-1);</script>'
 
         if users[username]["password"] == password:
             resp = make_response(redirect(url_for("index")))
             session_id = create_session(username, request.remote_addr)
+            print(f"[/login] success user={username} session_id={session_id} remote_addr={request.remote_addr} token={token_storage[session_id]}", flush=True)
             resp.set_cookie("sessionid", session_id)
             return resp
-        
+
+        print(f"[/login] wrong password for {username}, got_pwd_len={len(password)}, expected_len={len(users[username]['password'])}", flush=True)
         return '<script>alert("wrong password");history.go(-1);</script>'
 
 @app.route("/shop", methods=["GET", "POST"])
@@ -195,8 +237,23 @@ def shop():
     if username is None:
         return render_template("shop.html", price=FLAG_PRICE, text="please login")
 
+    already_purchased = username in purchased_users
+
     if request.method == "GET":
-        return render_template("shop.html", price=FLAG_PRICE)
+        return render_template(
+            "shop.html",
+            price=FLAG_PRICE,
+            flag=FLAG if already_purchased else None,
+            purchased=already_purchased,
+        )
+
+    if already_purchased:
+        return render_template(
+            "shop.html",
+            price=FLAG_PRICE,
+            flag=FLAG,
+            purchased=True,
+        )
 
     if users[username]["coin"] < FLAG_PRICE:
         return render_template(
@@ -206,8 +263,14 @@ def shop():
         )
 
     users[username]["coin"] -= FLAG_PRICE
+    purchased_users.add(username)
 
-    return render_template("shop.html", price=FLAG_PRICE, flag=FLAG)
+    return render_template(
+        "shop.html",
+        price=FLAG_PRICE,
+        flag=FLAG,
+        purchased=True,
+    )
 
 
 @app.route("/earn", methods=["GET", "POST"])
@@ -269,10 +332,12 @@ def rank():
 @app.route("/transfer", methods=["GET", "POST"])
 def transfer():
     session_id = request.cookies.get('sessionid', None)
+    print(f"[/transfer] method={request.method} session_id={session_id} remote_addr={request.remote_addr}", flush=True)
     try:
         username = session_storage[session_id]
         csrf_token = token_storage[session_id]
     except KeyError:
+        print(f"[/transfer] no session for {session_id}", flush=True)
         return render_template('transfer.html', text='please login')
     if request.method == 'GET':
         return render_template("transfer.html", csrf_token=csrf_token)
@@ -280,6 +345,7 @@ def transfer():
         form_token = request.form.get("csrf_token", "")
         to = request.form.get("to", "")
         amount_raw = request.form.get("amount", "0")
+        print(f"[/transfer] user={username} to={to} amount={amount_raw} form_token={form_token} expected={csrf_token}", flush=True)
 
         if form_token != csrf_token:
             return "invalid csrf token"
