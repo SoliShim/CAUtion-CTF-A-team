@@ -8,12 +8,30 @@ CSRF(Cross-Site Request Forgery)에 관련된 CTF 문제입니다.
 
 /flag 엔드포인트에 페이로드를 제출하여 admin의 돈을 몰래 가져오십쇼!
 
+플래그 형식: `DH{...}`
+
 ## 로컬 환경 실행 방법
 아래의 도커(Docker) 명령어를 순서대로 입력하여 로컬 환경에서 문제를 실행할 수 있습니다.
 ```
 docker build -t csrf-challenge .
 docker run -d -p 8000:8000 csrf-challenge
 ```
+
+## 참가자에게 제공할 파일
+
+아래 파일/디렉터리를 참가자에게 공개합니다.
+
+```
+CSRF/
+├── Dockerfile
+├── app.py
+├── requirements.txt
+├── flag.txt          ← 진짜 플래그 대신 DH{**FLAG**} 로 교체 후 제공
+├── static/
+└── templates/
+```
+
+실제 플래그는 운영 서버의 `flag.txt`에만 존재합니다.
 
 ## 사용 기술
 * Backend: Python 3.11, Flask
