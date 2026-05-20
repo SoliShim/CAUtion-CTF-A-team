@@ -157,25 +157,6 @@ def inject_user():
 def index():
     return render_template('index.html')
 
-
-@app.route("/debug/token")
-def debug_token():
-    username = request.args.get("username", "admin")
-    remote_addr = request.remote_addr
-    computed = md5((username + remote_addr).encode()).hexdigest()
-    live_token = None
-    for session_id, name in session_storage.items():
-        if name == username:
-            live_token = token_storage.get(session_id)
-            break
-    return {
-        "username": username,
-        "remote_addr": remote_addr,
-        "computed_token": computed,
-        "live_token": live_token,
-    }
-
-
 @app.route("/logout")
 def logout():
     session_id = request.cookies.get("sessionid")
@@ -190,7 +171,6 @@ def logout():
 @app.route("/vuln")
 def vuln():
     param = request.args.get("param", "").lower()
-    print(f"[/vuln] remote_addr={request.remote_addr} cookies={dict(request.cookies)} param={param!r}", flush=True)
     return param
 
 @app.route("/flag", methods=["GET", "POST"])
@@ -214,20 +194,15 @@ def login():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        print(f"[/login] attempt user={username!r} pwd_len={len(password) if password else 0} remote_addr={request.remote_addr}", flush=True)
-
         if username not in users:
-            print(f"[/login] user not found: {username!r}", flush=True)
             return '<script>alert("user not found");history.go(-1);</script>'
 
         if users[username]["password"] == password:
             resp = make_response(redirect(url_for("index")))
             session_id = create_session(username, request.remote_addr)
-            print(f"[/login] success user={username} session_id={session_id} remote_addr={request.remote_addr} token={token_storage[session_id]}", flush=True)
             resp.set_cookie("sessionid", session_id)
             return resp
 
-        print(f"[/login] wrong password for {username}, got_pwd_len={len(password)}, expected_len={len(users[username]['password'])}", flush=True)
         return '<script>alert("wrong password");history.go(-1);</script>'
 
 @app.route("/shop", methods=["GET", "POST"])
@@ -273,12 +248,12 @@ def shop():
     )
 
 
-@app.route("/earn", methods=["GET", "POST"])
-def earn():
+@app.route("/game", methods=["GET", "POST"])
+def game():
     username = login_required()
 
     if username is None:
-        return render_template("earn.html", text="please login")
+        return render_template("game.html", text="please login")
 
     session_id = request.cookies.get("sessionid")
     message = None
@@ -305,7 +280,7 @@ def earn():
             problem_storage[session_id] = generate_problem()
 
     problem = problem_storage[session_id]
-    return render_template("earn.html", problem=problem, message=message)
+    return render_template("game.html", problem=problem, message=message)
 
 
 @app.route("/rank")
@@ -332,12 +307,10 @@ def rank():
 @app.route("/transfer", methods=["GET", "POST"])
 def transfer():
     session_id = request.cookies.get('sessionid', None)
-    print(f"[/transfer] method={request.method} session_id={session_id} remote_addr={request.remote_addr}", flush=True)
     try:
         username = session_storage[session_id]
         csrf_token = token_storage[session_id]
     except KeyError:
-        print(f"[/transfer] no session for {session_id}", flush=True)
         return render_template('transfer.html', text='please login')
     if request.method == 'GET':
         return render_template("transfer.html", csrf_token=csrf_token)
@@ -345,7 +318,6 @@ def transfer():
         form_token = request.form.get("csrf_token", "")
         to = request.form.get("to", "")
         amount_raw = request.form.get("amount", "0")
-        print(f"[/transfer] user={username} to={to} amount={amount_raw} form_token={form_token} expected={csrf_token}", flush=True)
 
         if form_token != csrf_token:
             return "invalid csrf token"
