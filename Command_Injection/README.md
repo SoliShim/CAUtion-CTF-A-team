@@ -1,6 +1,6 @@
 # Command Injection Challenge
 
-Sungmin Shim의 command injection 문제입니다.
+command injection 문제입니다.
 
 ## 실행 방법
 
