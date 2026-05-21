@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageHub</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<div class="navbar">
+
+    <div class="logo">
+        ImageHub
+    </div>
+
+    <div class="nav-links">
+
+        {% if session.username %}
+            <a href="/upload">Upload</a>
+            <a href="/admin">Admin</a>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="hero">
+
+    <div class="hero-content">
+
+        <span class="tag">
+            Internal Media Platform
+        </span>
+
+        <h1>
+            Secure File Storage<br>
+            For Enterprise Teams
+        </h1>
+
+        <p>
+            Upload, manage and organize your internal media resources
+            through a centralized management system.
+        </p>
+
+        {% if session.username %}
+
+            <a href="/upload" class="main-btn">
+                Open Dashboard
+            </a>
+
+        {% else %}
+
+            <a href="/login" class="main-btn">
+                Get Started
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
