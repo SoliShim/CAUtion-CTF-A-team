@@ -42,19 +42,16 @@ def upload():
 
         filename = file.filename
 
-        # 취약한 확장자 검사
         if not (filename.endswith('.png') or filename.endswith('.jpg')):
             return 'Only png/jpg allowed'
 
         save_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(save_path)
 
-        # 업로드 파일 내용을 JSON으로 파싱
         try:
             with open(save_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
-            # 취약한 세션 merge
             session.update(data)
 
         except Exception:
