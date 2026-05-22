@@ -6,7 +6,8 @@ from bot import visit_ticket
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
-FLAG = "FLAG{XSSCompleted!}"
+FLAG = "CAUtion{XSSCompleted!}"
+COLLECTED = []
 
 def get_db():
     conn = sqlite3.connect("ctf.db")
@@ -132,19 +133,21 @@ def report():
 
         visit_ticket(ticket_id)
 
-        return "admin bot visited your ticket"
+        return "admin bot visited your ticket. collected reports are temporarily stored internally"
 
     return render_template("report.html")
 
 
 @app.route("/collect")
 def collect():
-
     data = request.args.get("data", "")
-
+    COLLECTED.append(data)
     print("[COLLECT]", data)
+    return "Saved to internal audit _log"
 
-    return "ok"
+@app.route("/collect_log")
+def collect_logs():
+    return "<br><hr>".join(COLLECTED)
 
 @app.route("/flag", methods=["GET", "POST"])
 def flag_submit():
@@ -163,4 +166,3 @@ def flag_submit():
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=80)
-
