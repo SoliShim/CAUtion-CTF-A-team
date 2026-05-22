@@ -1,0 +1,66 @@
+kk<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>Submit Flag</title>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">CTF</span>
+
+    <h1>Flag Submission</h1>
+
+    <div class="notice">
+      관리자 시스템의 민감정보를 획득하여 FLAG를 제출하세요.
+    </div>
+
+    <div class="card">
+
+      <form method="POST">
+
+        <p>
+          <label><strong>FLAG</strong></label>
+        </p>
+
+        <input type="text"
+               name="flag"
+               placeholder="CAUtion{...}"
+               required>
+
+        <br><br>
+
+        <button type="submit">
+          Submit
+        </button>
+
+      </form>
+
+    </div>
+
+    {% if message %}
+
+      <div class="card">
+
+        <p><strong>{{ message }}</strong></p>
+
+      </div>
+
+    {% endif %}
+
+    <p>
+      <a href="/">메인으로</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
