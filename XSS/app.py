@@ -6,7 +6,7 @@ from bot import visit_ticket
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
-FLAG = "CAUtion{XSSCompleted!}"
+FLAG = "FLAG{XSSCompleted!}"
 COLLECTED = []
 
 def get_db():
