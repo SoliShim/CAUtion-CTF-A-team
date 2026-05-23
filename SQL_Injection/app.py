@@ -101,7 +101,7 @@ def login():
                         </p>
                         
                         <form method="POST" action="/flag">
-                            <input type="text" name="flag" placeholder="CAUtion{{...}}" required autocomplete="off" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #dfe6e9; border-radius:6px; box-sizing:border-box; font-size:15px;">
+                            <input type="text" name="flag" placeholder="FLAG{{...}}" required autocomplete="off" ...>
                             <button type="submit" style="width:100%; padding:12px; background:#3498db; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s;">플래그 제출 🚩</button>
                         </form>
                         
