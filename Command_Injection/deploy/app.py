@@ -10,7 +10,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
 FLAG_PATH = os.path.join(BASE_DIR, "flag.txt")
-FLAG = os.environ.get("FLAG", "DH{fake_flag_for_local_test}")
+FLAG = os.environ.get("FLAG", "FLAG{fake_flag_for_local_test}")
 SAFE_FILENAME_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 

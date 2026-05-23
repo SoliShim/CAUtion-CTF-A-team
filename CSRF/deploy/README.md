@@ -8,7 +8,7 @@ CSRF(Cross-Site Request Forgery)에 관련된 CTF 문제입니다.
 
 /flag 엔드포인트에 페이로드를 제출하여 admin의 돈을 몰래 가져오십쇼!
 
-플래그 형식: `DH{...}`
+플래그 형식: `FLAG{...}`
 
 ## 로컬 환경 실행 방법
 아래의 도커(Docker) 명령어를 순서대로 입력하여 로컬 환경에서 문제를 실행할 수 있습니다.
@@ -26,7 +26,7 @@ CSRF/
 ├── Dockerfile
 ├── app.py
 ├── requirements.txt
-├── flag.txt          ← 진짜 플래그 대신 DH{**FLAG**} 로 교체 후 제공
+├── flag.txt          ← 진짜 플래그 대신 FLAG{dummy_flag_for_local_test} 로 교체 후 제공
 ├── static/
 └── templates/
 ```
