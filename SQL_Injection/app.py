@@ -5,7 +5,7 @@ from flask import Flask, request, render_template
 app = Flask(__name__)
 
 # 🎯 플래그 양식 (금지된 함수 이름들이 조롱하듯 들어있습니다)
-REAL_FLAG = 'CAUtion{n0_substr_n0_glob_n0_like_n0_instr_m4st3r}'
+REAL_FLAG = 'FLAG{n0_substr_n0_glob_n0_like_n0_instr_m4st3r}'
 
 def init_db():
     conn = sqlite3.connect('sqli.db')
