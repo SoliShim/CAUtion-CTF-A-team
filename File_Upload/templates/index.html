@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="/static/style.css">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -22,12 +22,8 @@
 
     <div class="nav-links">
 
-        {% if session.username %}
-            <a href="/upload">Upload</a>
-            <a href="/admin">Admin</a>
-        {% else %}
-            <a href="/login">Login</a>
-        {% endif %}
+        <a href="/upload">업로드</a>
+        <a href="/admin">관리자</a>
 
     </div>
 
@@ -38,32 +34,21 @@
     <div class="hero-content">
 
         <span class="tag">
-            Internal Media Platform
+            ImageHub
         </span>
 
         <h1>
-            Secure File Storage<br>
-            For Enterprise Teams
+            이미지 업로드<br>
+            웹사이트입니다
         </h1>
 
         <p>
-            Upload, manage and organize your internal media resources
-            through a centralized management system.
+            이미지를 업로드하고 관리할 수 있는 간단한 서비스입니다.
         </p>
 
-        {% if session.username %}
-
-            <a href="/upload" class="main-btn">
-                Open Dashboard
-            </a>
-
-        {% else %}
-
-            <a href="/login" class="main-btn">
-                Get Started
-            </a>
-
-        {% endif %}
+        <a href="/upload" class="main-btn">
+            시작하기
+        </a>
 
     </div>
 
