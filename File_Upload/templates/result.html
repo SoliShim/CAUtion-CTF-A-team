@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+<main class="result-shell">
+    <section class="result-panel">
+        <div class="terminal-label">검색 결과</div>
+        <h1>파일 검색 결과</h1>
+        <p class="result-path">{{ filename }}</p>
+
+        <pre class="result-output">{{ content }}</pre>
+
+        <a class="main-btn" href="/admin">다시 검색하기</a>
+    </section>
+</main>
+
+</body>
+</html>
