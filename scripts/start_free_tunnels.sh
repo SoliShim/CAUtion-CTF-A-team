@@ -66,5 +66,8 @@ echo
 echo "Updated link HTML:"
 echo "  $LINKS_HTML"
 echo
+echo "Check server status with:"
+echo "  ./scripts/check_server_status.sh"
+echo
 echo "Stop everything with:"
 echo "  ./scripts/stop_free_tunnels.sh"

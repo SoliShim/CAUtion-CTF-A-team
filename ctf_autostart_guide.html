@@ -154,6 +154,11 @@
     <pre>./scripts/show_tunnel_links.sh</pre>
     <p>나오는 <code>https://...trycloudflare.com</code> 주소 5개를 참가자에게 전달하면 됩니다.</p>
 
+    <h2>서버 실행 상태 확인</h2>
+    <p>링크가 열리지 않거나 서버가 제대로 켜졌는지 확인하고 싶을 때는 아래 명령어를 실행합니다.</p>
+    <pre>./scripts/check_server_status.sh</pre>
+    <p>이 명령어는 Docker 컨테이너 상태, 맥미니 내부 주소 응답 여부, Cloudflare 공개 링크 응답 여부를 한 번에 확인합니다. 마지막 줄이 <code>Overall: OK</code>이면 정상입니다.</p>
+
     <h2>상황별로 실행할 명령어</h2>
     <table>
       <thead>
@@ -178,6 +183,10 @@
         <tr>
           <td>현재 참가자용 링크를 확인할 때</td>
           <td><code>./scripts/show_tunnel_links.sh</code></td>
+        </tr>
+        <tr>
+          <td>서버와 공개 링크가 정상 실행 중인지 확인할 때</td>
+          <td><code>./scripts/check_server_status.sh</code><br><span class="small">컨테이너, 로컬 주소, 공개 터널 주소를 함께 점검합니다.</span></td>
         </tr>
         <tr>
           <td>대회가 끝나서 서버를 내릴 때</td>
@@ -230,6 +239,11 @@
           <td>참가자에게 보낼 최신 링크를 빠르게 확인하고 싶을 때 실행합니다.</td>
         </tr>
         <tr>
+          <td><code>check_server_status.sh</code></td>
+          <td>Docker 컨테이너가 실행 중인지, 로컬 문제 주소와 Cloudflare 공개 링크가 응답하는지 확인합니다.</td>
+          <td>링크가 열리지 않거나 재부팅 후 서버가 정상적으로 올라왔는지 확인하고 싶을 때 실행합니다.</td>
+        </tr>
+        <tr>
           <td><code>stop_free_tunnels.sh</code></td>
           <td>문제 서버와 Cloudflare 터널 컨테이너를 모두 중지합니다.</td>
           <td>대회가 끝났거나 서버를 잠시 내려야 할 때 실행합니다.</td>
@@ -256,7 +270,7 @@
         </tr>
       </tbody>
     </table>
-    <p>정리하면, 평소에는 <code>install_macos_autostart.sh</code>, <code>show_tunnel_links.sh</code>, <code>stop_free_tunnels.sh</code> 정도만 기억하면 됩니다.</p>
+    <p>정리하면, 평소에는 <code>install_macos_autostart.sh</code>, <code>show_tunnel_links.sh</code>, <code>check_server_status.sh</code>, <code>stop_free_tunnels.sh</code> 정도만 기억하면 됩니다.</p>
 
     <h2>플래그 관리</h2>
     <p>실제 대회 플래그는 저장소의 <code>.env.ctf</code>에 넣은 뒤 <code>./scripts/install_macos_autostart.sh</code>를 다시 실행해 자동 실행 전용 폴더로 반영합니다. 이 파일은 <code>.gitignore</code>에 포함되어 깃에 올라가지 않습니다.</p>
