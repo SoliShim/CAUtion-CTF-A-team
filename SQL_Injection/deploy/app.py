@@ -4,8 +4,8 @@ from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
-# 🎯 플래그 양식 (금지된 함수 이름들이 조롱하듯 들어있습니다)
-REAL_FLAG = 'FLAG{n0_substr_n0_glob_n0_like_n0_instr_m4st3r}'
+# 실제 운영 플래그는 서버 환경변수로 주입합니다.
+REAL_FLAG = os.environ.get("FLAG", "FLAG{dummy_substr_glob_like_instr_for_local_test}")
 
 def init_db():
     conn = sqlite3.connect('sqli.db')

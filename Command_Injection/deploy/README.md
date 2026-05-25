@@ -6,7 +6,7 @@ command injection 문제입니다.
 
 ```bash
 docker build -t command-injection-challenge .
-docker run --rm -p 8081:80 -e FLAG='DH{real_flag_here}' command-injection-challenge
+docker run --rm -p 8081:80 -e FLAG='FLAG{real_flag_here}' command-injection-challenge
 ```
 
 브라우저에서 `http://127.0.0.1:8081`로 접속하면 됩니다.

@@ -1,6 +1,6 @@
 # CAUtion CTF A Team
 
-CAUtion CTF A팀에서 제작한 웹 보안 CTF 문제 모음입니다. 각 디렉토리는 독립 실행 가능한 Flask 기반 챌린지로 구성되어 있으며, Docker로 로컬 환경에서 실행할 수 있습니다.
+CAUtion CTF A팀에서 제작한 웹 보안 CTF 문제 모음입니다. 각 문제 디렉토리는 서버 구축용 `deploy/`와 CTFd 참가자 배포용 `CTFd_*.zip`으로 분리되어 있습니다.
 
 ## 문제 목록
 
@@ -14,10 +14,10 @@ CAUtion CTF A팀에서 제작한 웹 보안 CTF 문제 모음입니다. 각 디�
 
 ## 실행 방법
 
-각 문제는 해당 디렉토리로 이동한 뒤 Docker 이미지를 빌드하고 실행합니다.
+각 문제는 해당 디렉토리의 `deploy/`로 이동한 뒤 Docker 이미지를 빌드하고 실행합니다.
 
 ```bash
-cd SQL_Injection
+cd SQL_Injection/deploy
 docker build -t caution-sqli .
 docker run --rm -p 8080:80 caution-sqli
 ```
@@ -31,7 +31,7 @@ docker run --rm -p 8081:80 caution-sqli
 CSRF 문제는 애플리케이션 내부 포트가 `8000`입니다.
 
 ```bash
-cd CSRF
+cd CSRF/deploy
 docker build -t caution-csrf .
 docker run --rm -p 8000:8000 caution-csrf
 ```
@@ -39,14 +39,14 @@ docker run --rm -p 8000:8000 caution-csrf
 Command Injection 문제는 실제 플래그를 환경 변수로 주입할 수 있습니다.
 
 ```bash
-cd Command_Injection
+cd Command_Injection/deploy
 docker build -t caution-command-injection .
-docker run --rm -p 8081:80 -e FLAG='DH{real_flag_here}' caution-command-injection
+docker run --rm -p 8081:80 -e FLAG='FLAG{real_flag_here}' caution-command-injection
 ```
 
 ## 로컬 실행
 
-Docker 없이 실행하려면 각 문제 디렉토리에서 Python 의존성을 설치한 뒤 `app.py`를 실행합니다.
+Docker 없이 실행하려면 각 문제의 `deploy/` 디렉토리에서 Python 의존성을 설치한 뒤 `app.py`를 실행합니다.
 
 ```bash
 pip install -r requirements.txt
@@ -60,14 +60,24 @@ Selenium 기반 관리자 봇이 포함된 `CSRF/`, `XSS/` 문제는 Chromium과
 ```text
 .
 ├── SQL_Injection/
+│   ├── deploy/
+│   └── CTFd_SQL_Injection.zip
 ├── CSRF/
+│   ├── deploy/
+│   └── CTFd_CSRF.zip
 ├── Command_Injection/
+│   ├── deploy/
+│   └── CTFd_Command_Injection.zip
 ├── File_Upload/
+│   ├── deploy/
+│   └── CTFd_File_Upload.zip
 ├── XSS/
+│   ├── deploy/
+│   └── CTFd_XSS.zip
 └── README.md
 ```
 
-각 문제 디렉토리에는 일반적으로 다음 파일이 포함되어 있습니다.
+각 문제의 `deploy/`에는 일반적으로 다음 파일이 포함되어 있습니다.
 
 ```text
 app.py
@@ -79,6 +89,7 @@ static/
 
 ## 운영 참고
 
+- 서버에는 각 문제의 `deploy/` 내용을 업로드하고, CTFd에는 문제 폴더 루트의 `CTFd_*.zip`만 첨부하세요.
 - 문제별 `README.md` 또는 `WRITEUP.md`가 있는 경우 세부 설명을 함께 확인하세요.
 - 참가자에게 배포할 때는 실제 플래그가 소스에 직접 노출되지 않도록 확인하세요.
 - 로컬 테스트용 플래그와 운영용 플래그는 분리해서 관리하는 것을 권장합니다.

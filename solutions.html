@@ -173,7 +173,7 @@
         <li>서버는 <code>head</code> 실행 뒤 <code>printenv FLAG</code>를 실행하고 결과를 <code>reports/result.txt</code>에 저장한다.</li>
         <li>화면 출력은 안전한 파일명일 때만 보여주므로, 다음 요청에서 <code>result.txt</code>를 조회한다.</li>
       </ol>
-      <div class="flag">Flag: 배포 환경의 <code>FLAG</code> 환경 변수 값. 로컬 기본값은 <code>DH{fake_flag_for_local_test}</code></div>
+      <div class="flag">Flag: 배포 환경의 <code>FLAG</code> 환경 변수 값. 로컬 기본값은 <code>FLAG{fake_flag_for_local_test}</code></div>
     </section>
 
     <section>
@@ -189,7 +189,7 @@
         <li>ID는 <code>admin</code>, Password는 flag 값을 입력한다.</li>
         <li>로그인 성공 문구 <code>Hello, admin!</code>이 출력된다.</li>
       </ol>
-      <div class="flag">Flag: <code>DH{n0_sp4c3_n0_substr_m4st3r}</code></div>
+      <div class="flag">Flag: 운영 서버의 <code>FLAG</code> 환경 변수 값</div>
     </section>
 
     <section>
@@ -208,7 +208,7 @@
         <li>세션의 <code>is_admin</code>이 <code>true</code>가 된다.</li>
         <li><code>/admin?file=flag.txt</code>로 접근해 서버의 flag 파일을 읽는다.</li>
       </ol>
-      <div class="flag">Flag: <code>DH{iamshyoo}</code></div>
+      <div class="flag">Flag: 운영 서버의 <code>flag.txt</code> 값</div>
     </section>
 
     <section>
@@ -234,7 +234,7 @@
         <li>admin 세션으로 <code>/transfer</code> POST가 발생하여 guest에게 2,147,483,647원이 송금된다.</li>
         <li>guest로 <code>/shop</code>에서 flag를 구매한다.</li>
       </ol>
-      <div class="flag">Flag: <code>DH{4dm1n_m0n3y_yummy}</code></div>
+      <div class="flag">Flag: 운영 서버의 <code>flag.txt</code> 값</div>
     </section>
 
     <section>
@@ -264,7 +264,7 @@ fetch('/admin/audit')
         <li><code>/api/unmask?target_id=1004</code>를 호출해 <code>sensitive_note</code> 안의 flag를 가져온다.</li>
         <li>로컬 환경에서는 <code>/collect</code> 로그에 exfiltration 결과가 찍힌다.</li>
       </ol>
-      <div class="flag">Flag: <code>FLAG{XSSCompleted!}</code></div>
+      <div class="flag">Flag: 운영 서버의 <code>FLAG</code> 환경 변수 값</div>
     </section>
 
     <section>

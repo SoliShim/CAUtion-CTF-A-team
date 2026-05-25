@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, abort, session, jsonify
+import os
 import sqlite3
 from datetime import datetime
 import secrets
@@ -6,7 +7,7 @@ from bot import visit_ticket
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
-FLAG = "FLAG{XSSCompleted!}"
+FLAG = os.environ.get("FLAG", "FLAG{dummy_xss_flag_for_local_test}")
 COLLECTED = []
 
 def get_db():
