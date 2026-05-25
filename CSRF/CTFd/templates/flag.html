@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Flag · CSRFBank{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>flag</h1>
+    <p class="muted">payload를 작성하실 수 있습니다.</p>
+
+    {% if message %}
+    <div class="alert alert-{{ message[0] }}">{{ message[1] }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('flag') }}" id="flag-form">
+        <div class="form-group">
+            <div class="url-input-row">
+                <span class="url-prefix">{{ base_url }}/vuln?param=</span>
+                <input type="text" id="param" name="param" required>
+            </div>
+        </div>
+        <button type="submit" id="flag-submit">전송하기</button>
+    </form>
+
+    <script>
+        document.getElementById("flag-form").addEventListener("submit", function() {
+            const btn = document.getElementById("flag-submit");
+            btn.disabled = true;
+            btn.textContent = "전송 중...";
+        });
+    </script>
+</div>
+{% endblock %}

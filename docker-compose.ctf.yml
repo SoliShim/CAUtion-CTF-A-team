@@ -1,0 +1,78 @@
+name: caution-ctf-a-team
+
+services:
+  command-injection:
+    build: ./Command_Injection/deploy
+    restart: unless-stopped
+    environment:
+      FLAG: ${COMMAND_FLAG:-FLAG{replace_command_flag_in_env_ctf}}
+    ports:
+      - "127.0.0.1:8001:80"
+
+  sql-injection:
+    build: ./SQL_Injection/deploy
+    restart: unless-stopped
+    environment:
+      FLAG: ${SQL_FLAG:-FLAG{replace_sql_flag_in_env_ctf}}
+    ports:
+      - "127.0.0.1:8002:8080"
+
+  csrf:
+    build: ./CSRF/deploy
+    restart: unless-stopped
+    environment:
+      FLAG: ${CSRF_FLAG:-FLAG{replace_csrf_flag_in_env_ctf}}
+    ports:
+      - "127.0.0.1:8003:8000"
+
+  xss:
+    build: ./XSS/deploy
+    restart: unless-stopped
+    environment:
+      FLAG: ${XSS_FLAG:-FLAG{replace_xss_flag_in_env_ctf}}
+      BASE_URL: http://127.0.0.1:80
+    ports:
+      - "127.0.0.1:8004:80"
+
+  file-upload:
+    build: ./File_Upload/deploy
+    restart: unless-stopped
+    environment:
+      FLAG: ${FILE_UPLOAD_FLAG:-FLAG{replace_file_upload_flag_in_env_ctf}}
+    ports:
+      - "127.0.0.1:8005:80"
+
+  tunnel-command-injection:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://command-injection:80
+    depends_on:
+      - command-injection
+
+  tunnel-sql-injection:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://sql-injection:8080
+    depends_on:
+      - sql-injection
+
+  tunnel-csrf:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://csrf:8000
+    depends_on:
+      - csrf
+
+  tunnel-xss:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://xss:80
+    depends_on:
+      - xss
+
+  tunnel-file-upload:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://file-upload:80
+    depends_on:
+      - file-upload

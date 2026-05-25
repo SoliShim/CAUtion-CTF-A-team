@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAUtion CTF 맥미니 자동 실행 안내</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #181a1f;
+      --muted: #666f7b;
+      --line: #d9dde4;
+      --accent: #075cad;
+      --ok: #0b7a3b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101215;
+        --panel: #191c21;
+        --text: #f2f4f8;
+        --muted: #a1a8b3;
+        --line: #303640;
+        --accent: #82bdff;
+        --ok: #68d391;
+      }
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.62;
+    }
+    main {
+      width: min(980px, calc(100% - 32px));
+      margin: 40px auto 72px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin-top: 32px;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 10px 0;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 24px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      margin: 16px 0;
+    }
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .command-label {
+      margin: 16px 0 6px;
+      font-weight: 700;
+    }
+    ol, ul {
+      padding-left: 22px;
+    }
+    li {
+      margin: 8px 0;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    pre {
+      overflow-x: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+    a {
+      color: var(--accent);
+    }
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CAUtion CTF 맥미니 자동 실행 안내</h1>
+    <p class="lead">맥미니가 재시동된 뒤 로그인하면 Docker 문제 서버 5개와 Cloudflare 무료 임시 터널 5개가 자동으로 실행됩니다. 공유 링크는 매번 자동 실행 전용 폴더의 <code>ctf_tunnel_links.html</code>에 갱신됩니다.</p>
+
+    <div class="panel">
+      <p><span class="ok">현재 방식:</span> 포트포워딩 없이 맥미니 내부의 Docker 서버를 Cloudflare <code>trycloudflare.com</code> 무료 임시 터널로 외부에 공개합니다.</p>
+      <p><span class="ok">비용:</span> 이 구성은 유료 클라우드 리소스를 만들지 않습니다.</p>
+    </div>
+
+    <h2>가장 먼저 알아둘 것</h2>
+    <div class="panel">
+      <p><strong>sh 파일을 실행한다</strong>는 말은 터미널 앱에 <code>./scripts/파일이름.sh</code> 같은 명령어를 입력하고 <strong>Enter</strong>를 누른다는 뜻입니다.</p>
+      <p>아래 명령어들은 한 줄씩 복사해서 터미널에 붙여넣고 <strong>Enter</strong>를 누르면 됩니다.</p>
+      <p class="small">비밀번호를 물어보는 창이나 입력란이 나오면 맥 로그인 비밀번호를 입력하세요. 터미널에서는 비밀번호를 입력해도 화면에 글자가 보이지 않을 수 있지만 정상입니다.</p>
+    </div>
+
+    <h2>터미널 여는 법</h2>
+    <ol>
+      <li>키보드에서 <strong>Command + Space</strong>를 누릅니다.</li>
+      <li><strong>Terminal</strong> 또는 <strong>터미널</strong>을 입력합니다.</li>
+      <li>터미널 앱을 열고, 아래 명령어를 한 줄씩 복사해서 붙여넣습니다.</li>
+    </ol>
+
+    <h2>작업 폴더로 이동</h2>
+    <p>스크립트는 이 프로젝트 폴더 안에서 실행해야 합니다. 터미널을 열고 먼저 아래 명령어를 실행하세요.</p>
+    <pre>cd /Users/sungminshim/Documents/GitHub/CAUtion-CTF-A-team</pre>
+    <p class="small">이 명령어는 “이 CTF 프로젝트 폴더로 이동한다”는 뜻입니다. 이후 명령어는 이 위치에서 실행합니다.</p>
+
+    <h2>처음 한 번만 자동 실행 설치</h2>
+    <p>맥미니를 재시동했을 때 자동으로 CTF 서버가 켜지게 하려면 아래 명령어를 실행합니다.</p>
+    <pre>./scripts/install_macos_autostart.sh</pre>
+    <p>이 명령어는 현재 문제 파일과 설정을 자동 실행 전용 폴더에 복사하고, macOS 로그인 시 자동으로 서버가 켜지도록 등록합니다.</p>
+
+    <h2>재부팅 후 링크 확인</h2>
+    <p>맥미니를 재시동한 뒤 로그인하고 1분 정도 기다린 다음, 최신 참가자 링크를 확인합니다.</p>
+    <p class="command-label">HTML 파일로 열기:</p>
+    <pre>open ~/.caution-ctf-a-team/ctf_tunnel_links.html</pre>
+    <p class="command-label">터미널에 링크만 출력하기:</p>
+    <pre>./scripts/show_tunnel_links.sh</pre>
+    <p>나오는 <code>https://...trycloudflare.com</code> 주소 5개를 참가자에게 전달하면 됩니다.</p>
+
+    <h2>상황별로 실행할 명령어</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>실행할 명령어</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>처음 자동 실행을 설치할 때</td>
+          <td><code>./scripts/install_macos_autostart.sh</code></td>
+        </tr>
+        <tr>
+          <td>플래그나 문제 파일을 수정한 뒤 재부팅용 설정에 다시 반영할 때</td>
+          <td><code>./scripts/install_macos_autostart.sh</code></td>
+        </tr>
+        <tr>
+          <td>지금 바로 문제 서버와 외부 링크를 켤 때</td>
+          <td><code>./scripts/start_free_tunnels.sh</code><br><span class="small">서버를 켠 뒤 <code>ctf_tunnel_links.html</code>도 최신 링크로 다시 만듭니다.</span></td>
+        </tr>
+        <tr>
+          <td>현재 참가자용 링크를 확인할 때</td>
+          <td><code>./scripts/show_tunnel_links.sh</code></td>
+        </tr>
+        <tr>
+          <td>대회가 끝나서 서버를 내릴 때</td>
+          <td><code>./scripts/stop_free_tunnels.sh</code><br><span class="small">서버를 내린 뒤 <code>ctf_tunnel_links.html</code>을 “종료된 상태”로 바꿉니다.</span></td>
+        </tr>
+        <tr>
+          <td>앞으로 재부팅해도 자동으로 켜지지 않게 할 때</td>
+          <td><code>./scripts/uninstall_macos_autostart.sh</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>로컬 확인 주소</h2>
+    <p>맥미니 안에서만 직접 확인할 때는 아래 주소를 브라우저에 입력합니다. 참가자에게는 이 주소가 아니라 <code>trycloudflare.com</code> 링크를 전달해야 합니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>문제</th>
+          <th>맥미니 내부 주소</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Command Injection</td><td><code>http://127.0.0.1:8001</code></td></tr>
+        <tr><td>SQL Injection</td><td><code>http://127.0.0.1:8002</code></td></tr>
+        <tr><td>CSRF</td><td><code>http://127.0.0.1:8003</code></td></tr>
+        <tr><td>XSS</td><td><code>http://127.0.0.1:8004</code></td></tr>
+        <tr><td>File Upload</td><td><code>http://127.0.0.1:8005</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>scripts 폴더 파일별 용도</h2>
+    <p>아래 표는 참고용입니다. 평소에는 위의 “상황별로 실행할 명령어”만 보면 됩니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>파일</th>
+          <th>용도</th>
+          <th>언제 실행하나</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>install_macos_autostart.sh</code></td>
+          <td>재부팅 후 자동 실행을 macOS에 설치하고, 현재 문제 파일과 설정을 <code>~/.caution-ctf-a-team</code>에 복사합니다.</td>
+          <td>처음 자동 실행을 설정할 때, 플래그나 문제 파일을 바꾼 뒤 자동 실행 전용 폴더에 다시 반영할 때 실행합니다.</td>
+        </tr>
+        <tr>
+          <td><code>show_tunnel_links.sh</code></td>
+          <td>현재 실행 중인 Cloudflare 무료 터널 주소 5개를 터미널에 출력합니다.</td>
+          <td>참가자에게 보낼 최신 링크를 빠르게 확인하고 싶을 때 실행합니다.</td>
+        </tr>
+        <tr>
+          <td><code>stop_free_tunnels.sh</code></td>
+          <td>문제 서버와 Cloudflare 터널 컨테이너를 모두 중지합니다.</td>
+          <td>대회가 끝났거나 서버를 잠시 내려야 할 때 실행합니다.</td>
+        </tr>
+        <tr>
+          <td><code>start_free_tunnels.sh</code></td>
+          <td>자동 실행과 별개로 문제 서버 5개와 무료 터널 5개를 즉시 실행합니다.</td>
+          <td>자동 실행을 기다리지 않고 지금 바로 수동으로 서버를 켜고 싶을 때 실행합니다.</td>
+        </tr>
+        <tr>
+          <td><code>autostart_ctf_tunnels.sh</code></td>
+          <td>Docker Desktop이 준비될 때까지 기다린 뒤 문제 서버와 터널을 올리고 링크 HTML을 갱신합니다.</td>
+          <td>macOS LaunchAgent가 재부팅 후 자동으로 실행하는 내부용 파일입니다. 보통 직접 실행하지 않습니다.</td>
+        </tr>
+        <tr>
+          <td><code>generate_tunnel_links_html.sh</code></td>
+          <td>현재 터널 로그에서 <code>trycloudflare.com</code> 주소를 읽어 <code>ctf_tunnel_links.html</code> 파일을 만듭니다.</td>
+          <td>자동 실행 또는 수동 시작 스크립트가 내부에서 사용합니다. 링크 HTML만 다시 만들고 싶을 때 직접 실행할 수 있습니다.</td>
+        </tr>
+        <tr>
+          <td><code>uninstall_macos_autostart.sh</code></td>
+          <td>macOS 재부팅 자동 실행 설정을 제거합니다.</td>
+          <td>다음 로그인 때 CTF 서버가 자동으로 켜지지 않게 하고 싶을 때만 실행합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>정리하면, 평소에는 <code>install_macos_autostart.sh</code>, <code>show_tunnel_links.sh</code>, <code>stop_free_tunnels.sh</code> 정도만 기억하면 됩니다.</p>
+
+    <h2>플래그 관리</h2>
+    <p>실제 대회 플래그는 저장소의 <code>.env.ctf</code>에 넣은 뒤 <code>./scripts/install_macos_autostart.sh</code>를 다시 실행해 자동 실행 전용 폴더로 반영합니다. 이 파일은 <code>.gitignore</code>에 포함되어 깃에 올라가지 않습니다.</p>
+    <pre>COMMAND_FLAG=FLAG{...}
+SQL_FLAG=FLAG{...}
+CSRF_FLAG=FLAG{...}
+XSS_FLAG=FLAG{...}
+FILE_UPLOAD_FLAG=FLAG{...}</pre>
+
+    <h2>주의할 점</h2>
+    <ul>
+      <li><code>trycloudflare.com</code> 임시 링크는 무료이지만, 터널 컨테이너가 새로 만들어지면 주소가 바뀔 수 있습니다.</li>
+      <li>재부팅 후 Docker Desktop이 완전히 뜨는 데 시간이 걸릴 수 있습니다. 링크 파일이 비어 있으면 1분 정도 기다린 뒤 새로고침하세요.</li>
+      <li>로그는 <code>~/.caution-ctf-a-team/logs/autostart.out.log</code>와 <code>~/.caution-ctf-a-team/logs/autostart.err.log</code>에서 확인할 수 있습니다.</li>
+    </ul>
+  </main>
+</body>
+</html>

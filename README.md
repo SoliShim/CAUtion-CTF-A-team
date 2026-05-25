@@ -1,6 +1,6 @@
 # CAUtion CTF A Team
 
-CAUtion CTF A팀에서 제작한 웹 보안 CTF 문제 모음입니다. 각 문제 디렉토리는 서버 구축용 `deploy/`와 CTFd 참가자 배포용 `CTFd_*.zip`으로 분리되어 있습니다.
+CAUtion CTF A팀에서 제작한 웹 보안 CTF 문제 모음입니다. 각 문제 디렉토리는 서버 구축용 `deploy/`, 참가자 배포용 원본 `CTFd/`, CTFd 첨부용 `CTFd_*.zip`으로 분리되어 있습니다.
 
 ## 문제 목록
 
@@ -61,36 +61,84 @@ Selenium 기반 관리자 봇이 포함된 `CSRF/`, `XSS/` 문제는 Chromium과
 .
 ├── SQL_Injection/
 │   ├── deploy/
+│   ├── CTFd/
 │   └── CTFd_SQL_Injection.zip
 ├── CSRF/
 │   ├── deploy/
+│   ├── CTFd/
 │   └── CTFd_CSRF.zip
 ├── Command_Injection/
 │   ├── deploy/
+│   ├── CTFd/
 │   └── CTFd_Command_Injection.zip
 ├── File_Upload/
 │   ├── deploy/
+│   ├── CTFd/
 │   └── CTFd_File_Upload.zip
 ├── XSS/
 │   ├── deploy/
+│   ├── CTFd/
 │   └── CTFd_XSS.zip
 └── README.md
 ```
 
-각 문제의 `deploy/`에는 일반적으로 다음 파일이 포함되어 있습니다.
+각 문제의 `deploy/`는 서버 구축용입니다. 실제 플래그는 `deploy/flag.txt`와 `.env.ctf`에만 둡니다.
 
 ```text
 app.py
 Dockerfile
 requirements.txt
+flag.txt
 templates/
 static/
+```
+
+각 문제의 `CTFd/`는 참가자 배포용 원본입니다. 이 폴더에는 `flag.txt`와 `WRITEUP.md`를 넣지 않습니다. CTFd에 첨부하는 `CTFd_*.zip`은 이 `CTFd/` 폴더를 압축한 파일입니다.
+
+CTFd 배포용 폴더와 zip을 다시 만들려면 아래 명령어를 실행합니다.
+
+```bash
+./scripts/rebuild_ctfd_packages.sh
 ```
 
 ## 운영 참고
 
 - 서버에는 각 문제의 `deploy/` 내용을 업로드하고, CTFd에는 문제 폴더 루트의 `CTFd_*.zip`만 첨부하세요.
+- `deploy/`에는 실제 플래그가 들어갈 수 있지만, `CTFd/`와 `CTFd_*.zip`에는 실제 플래그가 없어야 합니다.
 - 문제별 `README.md` 또는 `WRITEUP.md`가 있는 경우 세부 설명을 함께 확인하세요.
 - 참가자에게 배포할 때는 실제 플래그가 소스에 직접 노출되지 않도록 확인하세요.
 - 로컬 테스트용 플래그와 운영용 플래그는 분리해서 관리하는 것을 권장합니다.
 - 여러 문제를 동시에 실행할 때는 호스트 포트 충돌에 주의하세요.
+## 무료 로컬 호스팅과 외부 공개 링크
+
+맥미니에서 문제 서버를 직접 띄우고, 포트포워딩 없이 무료 임시 링크를 배포하려면 아래 방식을 사용합니다.
+
+```bash
+./scripts/start_free_tunnels.sh
+```
+
+이 스크립트는 5개 문제 서버를 로컬에서 실행하고, 문제별 Cloudflare 무료 임시 터널 주소를 출력합니다.
+
+로컬 확인 주소:
+
+- Command Injection: `http://127.0.0.1:8001`
+- SQL Injection: `http://127.0.0.1:8002`
+- CSRF: `http://127.0.0.1:8003`
+- XSS: `http://127.0.0.1:8004`
+- File Upload: `http://127.0.0.1:8005`
+
+실제 대회 플래그는 `.env.ctf`에만 넣고 깃에 올리지 않습니다. 처음 실행하면 `.env.ctf.example`을 복사해 `.env.ctf`를 자동 생성합니다. `.env.ctf`에서 `COMMAND_FLAG`, `SQL_FLAG`, `CSRF_FLAG`, `XSS_FLAG`, `FILE_UPLOAD_FLAG`를 실제 값으로 바꾼 뒤 실행하세요.
+
+종료:
+
+```bash
+./scripts/stop_free_tunnels.sh
+```
+
+현재 실행 중인 외부 링크만 다시 확인:
+
+```bash
+./scripts/show_tunnel_links.sh
+```
+
+Cloudflare `trycloudflare.com` 임시 터널은 무료이며 계정 없이 쓸 수 있지만, 재시작할 때마다 URL이 바뀔 수 있습니다.

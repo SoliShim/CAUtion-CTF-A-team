@@ -1,0 +1,8 @@
+.DS_Store
+.gitignore
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+README.md
+WRITEUP.md

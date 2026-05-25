@@ -17,7 +17,7 @@ COPY . .
 RUN mkdir -p uploads
 
 # 플래그 권한 설정
-RUN chmod 644 flag.txt
+RUN printf "%s\n" "FLAG_REMOVED_FOR_CTFD" > flag.txt && chmod 644 flag.txt
 
 # 6. Flask가 사용할 포트 번호
 EXPOSE 80

@@ -22,7 +22,7 @@ def load_flag():
         with open(FLAG_PATH, "r", encoding="utf-8") as file:
             return file.read().strip()
 
-    return "FLAG{fake_flag_for_local_test}"
+    return "FLAG_REMOVED_FOR_CTFD"
 
 
 FLAG = load_flag()

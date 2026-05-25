@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+  <title>문의 확인</title>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <span class="badge">REQUEST</span>
+
+    <h1>문의가 접수되었습니다</h1>
+
+    <div class="notice">
+      접수된 문의는 개인정보 보호 담당자가 검토 후 처리합니다.
+    </div>
+
+    <div class="card">
+
+      <p>
+        <strong>문의 번호:</strong>
+        {{ ticket.id }}
+      </p>
+
+      <p>
+        <strong>제목:</strong>
+        {{ ticket.title }}
+      </p>
+
+      <p>
+        <strong>작성 시간:</strong>
+        {{ ticket.created_at }}
+      </p>
+
+    </div>
+
+    <h3>문의 내용</h3>
+
+    <div class="card">
+
+      {{ ticket.content }}
+
+    </div>
+
+    <p>
+      <a class="btn" href="/request">
+        다른 문의 작성하기
+      </a>
+    </p>
+
+    <p>
+      <a href="/">메인으로</a>
+    </p>
+
+  </div>
+
+</body>
+</html>

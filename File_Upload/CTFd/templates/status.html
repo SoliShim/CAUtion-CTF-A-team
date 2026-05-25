@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+<div class="scanlines"></div>
+
+<main class="status-shell">
+    <section class="status-panel {{ variant }}">
+        <div class="status-kicker">알림</div>
+        <h1>{{ title }}</h1>
+        <p>{{ message }}</p>
+
+        <a class="main-btn" href="{{ action_href }}">{{ action_label }}</a>
+    </section>
+</main>
+
+</body>
+</html>

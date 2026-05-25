@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+<div class="admin-container">
+
+    <div class="admin-header">
+
+        <div>
+            <div class="terminal-label">관리자</div>
+            <h1>관리자 페이지</h1>
+            <p>서버의 파일을 검색할 수 있습니다.</p>
+        </div>
+
+    </div>
+
+    <div class="admin-card">
+
+        <h2>파일 검색</h2>
+
+        <form method="GET">
+
+            <input
+                type="text"
+                name="file"
+                placeholder="파일 경로 입력"
+            >
+
+            <button type="submit">
+                검색
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

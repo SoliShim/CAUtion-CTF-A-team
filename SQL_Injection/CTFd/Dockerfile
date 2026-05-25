@@ -13,14 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 5. 나머지 모든 문제 파일(app.py, templates 등) 복사
 COPY . .
 
-# 업로드 디렉토리 생성
-RUN mkdir -p uploads
-
-# 플래그 권한 설정
-RUN chmod 644 flag.txt
-
-# 6. Flask가 사용할 포트 번호
+# 6. Flask가 사용할 포트 번호 (기본 80번)
 EXPOSE 80
 
 # 7. 서버 실행 명령어
-CMD ["sh", "-c", "if [ -n \"$FLAG\" ]; then printf '%s\n' \"$FLAG\" > flag.txt; fi; python app.py"]
+CMD ["python", "app.py"]

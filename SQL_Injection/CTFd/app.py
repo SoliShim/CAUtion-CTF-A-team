@@ -17,7 +17,7 @@ def load_flag():
         with open(FLAG_PATH, "r", encoding="utf-8") as file:
             return file.read().strip()
 
-    return "FLAG{dummy_substr_glob_like_instr_for_local_test}"
+    return "FLAG_REMOVED_FOR_CTFD"
 
 
 REAL_FLAG = load_flag()
@@ -38,8 +38,6 @@ init_db()
 
 # 🔥 악마의 웹 방화벽 (WAF)
 def check_waf(input_str):
-    # 💡 중요: 플래그 자체에 'substr', 'glob' 같은 금지어가 포함되어 있으므로, 
-    # 정답을 정확히 입력한 경우에는 WAF를 예외적으로 통과시켜줍니다.
     if input_str == REAL_FLAG:
         return True, "Pass"
 
@@ -102,8 +100,6 @@ def login():
             cursor.execute(query)
             result = cursor.fetchone()
             conn.close()
-
-            # 💡 로그인이 뚫렸을 때 (우회든, 찐 비번이든 무조건 대시보드 출력)
             if result:
                 return f"""
                 <body style='background:#f4f7f6; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; margin:0;'>
@@ -116,7 +112,7 @@ def login():
                         </p>
                         
                         <form method="POST" action="/flag">
-                            <input type="text" name="flag" placeholder="FLAG{{...}}" required autocomplete="off" ...>
+                            <input type="text" name="flag" placeholder="FLAG_REMOVED_FOR_CTFD" required autocomplete="off" ...>
                             <button type="submit" style="width:100%; padding:12px; background:#3498db; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s;">플래그 제출 🚩</button>
                         </form>
                         

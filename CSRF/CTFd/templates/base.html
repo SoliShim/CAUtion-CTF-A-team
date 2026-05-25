@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CSRFBank{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-inner">
+            <div class="nav-left">
+                <a href="{{ url_for('index') }}" class="brand">CSRFBank</a>
+                <a href="{{ url_for('shop') }}">상점</a>
+                <a href="{{ url_for('game') }}">게임</a>
+                <a href="{{ url_for('transfer') }}">송금</a>
+                <a href="{{ url_for('rank') }}">랭킹</a>
+                <a href="{{ url_for('vuln', param='hello') }}">vuln</a>
+                <a href="{{ url_for('flag') }}">flag</a>
+            </div>
+            <div class="nav-right">
+                {% if current_user %}
+                    <span class="user-name">{{ current_user }}</span>
+                    <span class="coin-badge">{{ "{:,}".format(current_money) }}원</span>
+                    <a href="{{ url_for('logout') }}">로그아웃</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
