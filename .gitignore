@@ -1,4 +1,5 @@
 .env.ctf
+.env.ctfd.local
 ctf_tunnel_links.html
 logs/
 .DS_Store

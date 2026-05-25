@@ -141,4 +141,48 @@ CTFd 배포용 폴더와 zip을 다시 만들려면 아래 명령어를 실행�
 ./scripts/show_tunnel_links.sh
 ```
 
+서버 상태를 한 번 확인:
+
+```bash
+./scripts/check_server_status.sh
+```
+
+서버 상태를 계속 감시하면서 맥이 절전모드에 들어가지 않게 유지:
+
+```bash
+./scripts/monitor_server_status.sh
+```
+
+기본 확인 주기는 1분입니다. 매개변수는 초 단위입니다. 예를 들어 30초마다 확인하려면 아래처럼 실행합니다. 이 기능은 화면 잠자기는 막지 않으므로 화면은 꺼질 수 있지만, 모니터링이 켜져 있는 동안 서버는 계속 동작하도록 유지합니다.
+
+```bash
+./scripts/monitor_server_status.sh --interval 30
+```
+
+현재 실행 중인 외부 링크를 CTFd의 B조 문제 Message에 자동 반영:
+
+```bash
+./scripts/update_ctfd_challenge_links.sh
+```
+
+이 스크립트는 CTFd의 B조 5문제를 찾아 각 문제 Message를 아래 형식으로 바꿉니다.
+
+```text
+B조 XSS 문제입니다.
+아래 링크로 접속해주세요.
+https://...trycloudflare.com
+```
+
+CTFd 접속 정보는 실행할 때 입력하거나, 추적되지 않는 로컬 파일인 `.env.ctfd.local`에 넣을 수 있습니다.
+
+```bash
+cp .env.ctfd.local.example .env.ctfd.local
+```
+
+서버 실행, 상태 확인, CTFd Message 업데이트를 한 번에 실행:
+
+```bash
+./scripts/run_ctf_pipeline.sh
+```
+
 Cloudflare `trycloudflare.com` 임시 터널은 무료이며 계정 없이 쓸 수 있지만, 재시작할 때마다 URL이 바뀔 수 있습니다.
