@@ -17,8 +17,23 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 if [ ! -f "$ENV_FILE" ]; then
-  cp "$ROOT_DIR/.env.ctf.example" "$ENV_FILE"
-  echo "Created $ENV_FILE from the example. Edit it before the real event flags are needed."
+  {
+    printf 'COMMAND_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/Command_Injection/deploy/flag.txt")"
+    printf 'SQL_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/SQL_Injection/deploy/flag.txt")"
+    printf 'CSRF_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/CSRF/deploy/flag.txt")"
+    printf 'XSS_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/XSS/deploy/flag.txt")"
+    printf 'FILE_UPLOAD_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/File_Upload/deploy/flag.txt")"
+  } > "$ENV_FILE"
+  echo "Created $ENV_FILE from deploy flag files."
+elif grep -Eq 'FLAG\{replace_.*flag(_in_env_ctf)?\}' "$ENV_FILE"; then
+  {
+    printf 'COMMAND_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/Command_Injection/deploy/flag.txt")"
+    printf 'SQL_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/SQL_Injection/deploy/flag.txt")"
+    printf 'CSRF_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/CSRF/deploy/flag.txt")"
+    printf 'XSS_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/XSS/deploy/flag.txt")"
+    printf 'FILE_UPLOAD_FLAG=%s\n' "$(sed -n '1p' "$ROOT_DIR/File_Upload/deploy/flag.txt")"
+  } > "$ENV_FILE"
+  echo "Replaced placeholder flags in $ENV_FILE from deploy flag files."
 fi
 
 docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up --build -d

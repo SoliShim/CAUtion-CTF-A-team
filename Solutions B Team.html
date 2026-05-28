@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAUtion CTF B-team 5문제 정답지</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --ink: #17202a;
+      --muted: #667085;
+      --panel: #ffffff;
+      --line: #d9e2ec;
+      --soft: #f8fafc;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --danger: #b42318;
+      --code: #111827;
+      --code-ink: #e5edf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    header {
+      background: #182230;
+      color: #ffffff;
+      padding: 42px 20px 36px;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 16px;
+    }
+
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav .wrap {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 16px;
+    }
+
+    nav a {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #344054;
+      padding: 7px 12px;
+      text-decoration: none;
+      font-size: 14px;
+      background: var(--soft);
+    }
+
+    main {
+      padding: 28px 0 54px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin: 18px 0;
+      padding: 24px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: #15384a;
+      font-size: 25px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 24px 0 8px;
+      color: var(--accent);
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 11px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4f7;
+      width: 180px;
+    }
+
+    code {
+      background: #eef3f8;
+      border: 1px solid #d9e2ec;
+      border-radius: 5px;
+      padding: 1px 5px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.94em;
+      word-break: break-all;
+    }
+
+    pre {
+      background: var(--code);
+      color: var(--code-ink);
+      border-radius: 7px;
+      overflow: auto;
+      padding: 15px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.55;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--soft);
+    }
+
+    .label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .flag {
+      border-left: 5px solid var(--accent-2);
+      background: #fff7ed;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .warn {
+      border-left: 5px solid var(--danger);
+      background: #fff4f2;
+      padding: 12px 14px;
+      border-radius: 6px;
+    }
+
+    .thought {
+      border-left: 5px solid var(--accent);
+      background: #eefaf8;
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 14px 0;
+    }
+
+    .thought strong {
+      color: #0f5f59;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 18px;
+      }
+
+      th,
+      td {
+        display: block;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>CAUtion CTF B-team 5문제 정답지</h1>
+      <p class="subtitle">초보자도 따라 할 수 있도록 취약점 원리, 풀이 이유, 페이로드를 단계별로 정리했습니다.</p>
+    </div>
+  </header>
+
+  <nav>
+    <div class="wrap">
+      <a href="#summary">정답 요약</a>
+      <a href="#command">Command Injection</a>
+      <a href="#sqli">SQL Injection</a>
+      <a href="#ssti">SSTI</a>
+      <a href="#idor">IDOR</a>
+      <a href="#upload">File Upload</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="summary">
+      <h2>정답 요약</h2>
+      <p>이 정답지는 현재 디렉토리의 B팀 5문제 소스와 실제 문제 서버 확인 결과를 기준으로 작성했습니다. 로컬 파일의 fake flag와 실제 서버 flag가 다른 문제는 실제 서버에서 확인한 값을 기준으로 적었습니다.</p>
+      <div class="summary">
+        <div class="card"><span class="label">Command Injection</span><code>FLAG{qu0te_spl1tt1ng_byp4ss_k3yw0rd_f1lt3r!}</code></div>
+        <div class="card"><span class="label">SQL Injection</span><code>FLAG{m4st3r_0f_sq1_4nd_d3vt00ls}</code></div>
+        <div class="card"><span class="label">SSTI</span><code>FLAG{n0_d0t_n0_und3rsc0r3_n0_pr0bl3m}</code></div>
+        <div class="card"><span class="label">IDOR</span><code>FLAG{c7f_2nc0d3d_1D0r_3uCces2}</code></div>
+        <div class="card"><span class="label">File Upload</span><code>FLAG{theme_pack_paths_change_after_normalization}</code></div>
+      </div>
+    </section>
+
+    <section id="command">
+      <h2>1. Command Injection</h2>
+      <table>
+        <tr><th>문제 목표</th><td>DNS 조회 기능을 이용해 서버의 <code>/flag</code> 파일을 읽습니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>사용자가 입력한 host 값이 shell 명령어 문자열에 그대로 붙고, <code>os.popen()</code>으로 실행됩니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>cmd = f"nslookup {host}"</code></td></tr>
+        <tr><th>최종 페이로드</th><td><code>example.com;sort /fla?</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 정상 기능부터 확인합니다.</strong> 입력칸에 <code>example.com</code>을 넣으면 DNS 조회 결과가 나옵니다. 즉 서버가 내부에서 <code>nslookup</code> 같은 명령어를 실행한다는 것을 알 수 있습니다.</p>
+        <p><strong>그다음 의심할 지점은 host 입력값입니다.</strong> 사용자가 넣은 문자열이 명령어 뒤에 붙는다면, shell 문법을 같이 넣었을 때 새 명령이 실행될 수 있습니다.</p>
+        <p><strong>세미콜론을 떠올립니다.</strong> Linux shell에서 <code>명령1;명령2</code>는 두 명령을 순서대로 실행합니다. 그래서 host 자리에 <code>example.com;id</code> 같은 형태를 넣는 발상을 할 수 있습니다.</p>
+        <p><strong>하지만 쉬운 명령은 필터에 막힙니다.</strong> <code>cat</code>, <code>flag</code>, <code>grep</code>, <code>bash</code> 같은 단어가 차단됩니다. 이때 "파일을 읽는 다른 명령은 없을까?"와 "flag라는 단어를 직접 쓰지 않는 방법은 없을까?"로 생각을 바꿉니다.</p>
+        <p><strong><code>sort</code>와 glob을 조합합니다.</strong> <code>sort 파일명</code>도 파일 내용을 출력할 수 있고, <code>/fla?</code>는 shell에서 <code>/flag</code>와 매칭됩니다. 따라서 금지어를 직접 쓰지 않고도 같은 파일을 읽을 수 있습니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>Command Injection은 입력값이 운영체제 명령어 일부로 실행될 때 생깁니다. 이 문제에서는 서버가 <code>nslookup 사용자의입력</code>을 shell에 넘깁니다. shell은 세미콜론 <code>;</code> 뒤를 새 명령으로 해석하므로, DNS 조회 뒤에 파일 읽기 명령을 이어 붙일 수 있습니다.</p>
+      <p>문제의 필터는 강해 보이지만 완전하지 않습니다. <code>flag</code>라는 단어는 막지만 <code>/fla?</code> 같은 shell glob은 막지 않고, <code>cat</code>은 막지만 <code>sort</code>는 막지 않습니다.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>정상 입력 <code>example.com</code>으로 DNS 조회 페이지가 동작하는지 확인합니다.</li>
+        <li>소스에서 <code>os.popen()</code>과 <code>cmd = f"nslookup {host}"</code>를 확인하고, 입력값이 shell 명령어에 직접 붙는다고 판단합니다.</li>
+        <li>금지어 목록을 보고 <code>cat /flag</code>는 막힌다는 것을 확인합니다.</li>
+        <li>파일 내용을 출력할 수 있는 허용 명령 <code>sort</code>를 선택합니다.</li>
+        <li><code>flag</code> 단어를 직접 쓰지 않기 위해 <code>/fla?</code>를 사용합니다.</li>
+        <li>입력칸에 아래 값을 넣습니다.</li>
+      </ol>
+      <pre>example.com;sort /fla?</pre>
+      <ol start="7">
+        <li>DNS 조회 결과 아래쪽에 flag가 함께 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{qu0te_spl1tt1ng_byp4ss_k3yw0rd_f1lt3r!}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>필터는 특정 단어만 막습니다. 하지만 shell에는 같은 결과를 내는 표현이 많습니다. 이 문제의 핵심은 차단 목록과 shell 문법 사이의 빈틈을 찾아 <code>cat /flag</code>와 같은 효과를 다른 표현으로 만드는 것입니다.</p>
+    </section>
+
+    <section id="sqli">
+      <h2>2. SQL Injection</h2>
+      <table>
+        <tr><th>문제 목표</th><td>숨겨진 SQLite 테이블을 찾아 flag 값을 조회합니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>사용자 입력이 파라미터 바인딩 없이 SQL 문자열에 직접 들어갑니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>SELECT username, dummy_pw FROM accounts WHERE username='{user_input}'</code></td></tr>
+        <tr><th>최종 페이로드</th><td><code>'\tUNION\tSELECT\ttop_secret,flag_val\tFROM\tsecret_vault_8f2a\tWHERE\t'1'='1</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 작은따옴표를 의심합니다.</strong> 로그인 또는 계정 조회 문제에서 입력값이 SQL에 들어간다면 <code>'</code>로 문자열을 닫을 수 있는지 확인합니다.</p>
+        <p><strong>공백이 막히면 우회 공백을 찾습니다.</strong> 필터는 일반 공백 <code> </code>, <code>--</code>, <code>/*</code>만 막습니다. SQLite는 탭 문자도 공백처럼 처리하므로 <code>\t</code>를 사용합니다.</p>
+        <p><strong>먼저 전체 계정 조회로 취약점을 확인합니다.</strong> <code>' OR '1'='1</code> 형태를 탭으로 바꾸면 모든 계정 행이 출력됩니다. 여기서 SQL Injection이 된다는 것을 확인합니다.</p>
+        <p><strong>그다음 DB 구조를 봅니다.</strong> flag가 현재 화면에 없다면 숨겨진 테이블을 찾아야 합니다. SQLite에서는 <code>sqlite_master</code>에 테이블 이름과 생성 SQL이 들어 있습니다.</p>
+        <p><strong>테이블과 컬럼을 알면 최종 조회를 합니다.</strong> <code>secret_vault_8f2a</code> 테이블의 <code>top_secret</code>, <code>flag_val</code> 컬럼을 <code>UNION SELECT</code>로 화면에 출력합니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>SQL Injection은 입력값이 데이터가 아니라 SQL 문법으로 해석될 때 발생합니다. 이 문제는 <code>username='입력값'</code>처럼 작은따옴표 안에 입력을 넣으므로, 입력값이 <code>'</code>로 시작하면 원래 문자열을 닫고 뒤에 SQL 문법을 추가할 수 있습니다.</p>
+      <p>서버가 마지막 작은따옴표를 자동으로 붙이기 때문에, 페이로드 끝도 문법적으로 맞춰야 합니다. 주석이 막혀 있으므로 마지막에 <code>WHERE '1'='1</code> 같은 조건을 붙여 quote balance를 맞춥니다.</p>
+
+      <h3>취약점 확인</h3>
+      <p>공백 대신 Tab을 넣어 아래 값을 입력합니다.</p>
+      <pre>'	OR	'1'='1</pre>
+      <p>실제 SQL은 대략 아래처럼 됩니다.</p>
+      <pre>SELECT username, dummy_pw FROM accounts WHERE username='' OR '1'='1'</pre>
+      <p>결과에 <code>guest</code>, <code>admin</code> 행이 보이면 입력이 SQL 문법으로 실행된 것입니다.</p>
+
+      <h3>테이블 구조 확인</h3>
+      <pre>'	UNION	SELECT	name,sql	FROM	sqlite_master	WHERE	type='table</pre>
+      <p>여기서 숨겨진 테이블 <code>secret_vault_8f2a</code>와 컬럼 <code>top_secret</code>, <code>flag_val</code>을 확인합니다.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>입력칸에 <code>'</code>를 넣어 SQL 문법 오류가 나는지 확인합니다.</li>
+        <li><code>'	OR	'1'='1</code>로 전체 계정 행이 나오는지 확인합니다.</li>
+        <li><code>sqlite_master</code>를 <code>UNION SELECT</code>로 조회해 숨겨진 테이블 이름을 찾습니다.</li>
+        <li>찾은 테이블과 컬럼 이름으로 아래 최종 페이로드를 넣습니다.</li>
+      </ol>
+      <pre>'	UNION	SELECT	top_secret,flag_val	FROM	secret_vault_8f2a	WHERE	'1'='1</pre>
+      <ol start="5">
+        <li>결과 테이블에 <code>TOP_SECRET / FLAG...</code>가 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{m4st3r_0f_sq1_4nd_d3vt00ls}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>이 문제는 로그인 우회보다 데이터 추출이 목표입니다. 화면에 두 개의 컬럼이 출력되므로, <code>UNION SELECT</code>도 컬럼 두 개를 맞춰서 넣으면 숨겨진 테이블의 값을 기존 결과 화면에 끼워 넣을 수 있습니다.</p>
+    </section>
+
+    <section id="ssti">
+      <h2>3. SSTI</h2>
+      <table>
+        <tr><th>문제 목표</th><td>프로필 자기소개 입력을 이용해 서버의 <code>/app/flag.txt</code>를 읽습니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>사용자 입력이 Jinja 템플릿 문자열 안에 들어간 뒤 <code>render_template_string()</code>으로 다시 렌더링됩니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>{p['bio']}</code>가 들어간 문자열을 <code>render_template_string(profile_template)</code>으로 실행</td></tr>
+        <tr><th>최종 페이로드</th><td><code>{{url_for|attr('_'*2+'globals'+'_'*2)|attr('_'*2+'getitem'+'_'*2)('_'*2+'builtins'+'_'*2)|attr('_'*2+'getitem'+'_'*2)('_'*2+'import'+'_'*2)('os')|attr('popen')('cat /app/flag?txt')|attr('read')()}}</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 템플릿 계산식을 넣어 봅니다.</strong> 자기소개 칸에 <code>{{7*7}}</code>을 넣었을 때 <code>49</code>가 나오면, 서버가 입력을 단순 텍스트가 아니라 템플릿 코드로 실행한다는 뜻입니다.</p>
+        <p><strong>그다음 목표는 파일 읽기입니다.</strong> README에 <code>flag.txt 파일을 읽으면 됩니다</code>라고 되어 있으므로, Jinja에서 Python 객체를 타고 들어가 명령 실행 또는 파일 읽기까지 도달해야 합니다.</p>
+        <p><strong>필터 때문에 정석 페이로드는 막힙니다.</strong> 원격 서버는 <code>.</code>, <code>__</code>, <code>class</code>, <code>mro</code>, <code>subclasses</code>, <code>request</code>, <code>self</code>, <code>config</code> 같은 패턴을 막습니다.</p>
+        <p><strong>점 접근은 <code>attr</code>로 바꿉니다.</strong> <code>a.b</code>처럼 쓰면 점이 필터에 걸리므로 <code>a|attr('b')</code> 형태를 사용합니다.</p>
+        <p><strong>더블 언더스코어는 문자열 조합으로 만듭니다.</strong> <code>__globals__</code>를 직접 쓰면 막히지만 <code>'_'*2+'globals'+'_'*2</code>는 렌더링 시점에 같은 문자열이 됩니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>SSTI는 Server-Side Template Injection입니다. Jinja 템플릿에서 <code>{{ ... }}</code> 안의 표현식은 서버에서 계산됩니다. 문제는 사용자의 자기소개가 템플릿 문자열 안에 그대로 삽입되고, 그 전체 문자열이 다시 렌더링된다는 점입니다.</p>
+      <p>Flask 템플릿에는 <code>url_for</code> 같은 함수가 기본으로 들어 있습니다. 함수 객체의 전역 변수 목록을 따라가면 Python의 <code>__builtins__</code>에 접근할 수 있고, 거기서 <code>__import__('os')</code>를 통해 명령 실행에 도달할 수 있습니다.</p>
+
+      <h3>취약점 확인</h3>
+      <p>자기소개 칸에 아래 값을 넣습니다.</p>
+      <pre>{{7*7}}</pre>
+      <p>결과가 <code>49</code>이면 SSTI가 맞습니다.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li><code>/create</code> 페이지에서 새 프로필을 만듭니다.</li>
+        <li>자기소개에 <code>{{7*7}}</code>을 넣어 계산되는지 확인합니다.</li>
+        <li>필터가 <code>.</code>과 <code>__</code>를 막으므로, 점 접근 대신 <code>attr</code> 필터를 사용합니다.</li>
+        <li><code>__globals__</code>, <code>__getitem__</code>, <code>__builtins__</code>, <code>__import__</code>는 직접 쓰지 않고 문자열 조합으로 만듭니다.</li>
+        <li><code>flag.txt</code>의 점도 필터에 걸리므로 shell glob인 <code>flag?txt</code>로 바꿉니다.</li>
+        <li>자기소개 칸에 아래 최종 페이로드를 넣습니다.</li>
+      </ol>
+      <pre>{{url_for|attr('_'*2+'globals'+'_'*2)|attr('_'*2+'getitem'+'_'*2)('_'*2+'builtins'+'_'*2)|attr('_'*2+'getitem'+'_'*2)('_'*2+'import'+'_'*2)('os')|attr('popen')('cat /app/flag?txt')|attr('read')()}}</pre>
+      <ol start="7">
+        <li>생성된 프로필 카드의 자기소개 영역에 flag가 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{n0_d0t_n0_und3rsc0r3_n0_pr0bl3m}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>이 문제의 핵심은 "필터가 막는 문자열을 입력에 직접 쓰지 않는다"입니다. Jinja가 표현식을 계산하는 시점에 금지 문자열이 만들어지도록 하면, 입력 필터를 지나간 뒤 원하는 객체 접근을 할 수 있습니다.</p>
+    </section>
+
+    <section id="idor">
+      <h2>4. IDOR</h2>
+      <table>
+        <tr><th>문제 목표</th><td>숨겨진 내부 공유 노트를 찾아 flag가 들어 있는 내용을 읽습니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>공유 노트 조회와 존재 확인 API가 로그인 여부만 확인하고, 현재 사용자의 접근 권한은 확인하지 않습니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>SELECT * FROM share_notes WHERE note_key=?</code></td></tr>
+        <tr><th>최종 키</th><td><code>internal_backup</code> → <code>aW50ZXJuYWxfYmFja3Vw</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 guest로 로그인합니다.</strong> 로그인 페이지에 <code>guest / guest123</code> 계정이 제공됩니다. 문제는 인증 우회가 아니라 로그인 후의 객체 접근 문제라고 볼 수 있습니다.</p>
+        <p><strong>예시 공유 링크를 관찰합니다.</strong> challenge 페이지에 <code>/share/Z3Vlc3Rfbm90ZQ==</code>가 보입니다. 끝의 <code>==</code> 모양 때문에 Base64를 의심할 수 있습니다.</p>
+        <p><strong>디코딩하면 의미 있는 이름이 나옵니다.</strong> <code>Z3Vlc3Rfbm90ZQ==</code>를 디코딩하면 <code>guest_note</code>입니다. 즉 공유 키는 랜덤 토큰이 아니라 예측 가능한 이름을 인코딩한 값입니다.</p>
+        <p><strong>존재 확인 API를 oracle로 씁니다.</strong> <code>/api/share/check?key=VALUE</code>는 존재하면 200, 없으면 404를 돌려줍니다. 이 차이로 숨겨진 note_key 후보를 테스트할 수 있습니다.</p>
+        <p><strong>힌트에 맞춰 내부 백업 이름을 추측합니다.</strong> 내부 공유 객체라면 <code>internal_backup</code> 같은 이름이 자연스럽습니다. 이를 Base64로 바꾸어 확인합니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>IDOR는 Insecure Direct Object Reference입니다. URL이나 파라미터에 들어가는 객체 ID를 사용자가 바꿀 수 있는데, 서버가 그 객체를 볼 권한이 있는지 확인하지 않으면 발생합니다.</p>
+      <p>Base64는 암호화가 아니라 인코딩입니다. 누구나 원래 문자열로 되돌릴 수 있으므로 접근 제어 수단이 될 수 없습니다.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li><code>/login</code>에서 <code>guest / guest123</code>으로 로그인합니다.</li>
+        <li>challenge 페이지의 예시 링크 <code>/share/Z3Vlc3Rfbm90ZQ==</code>를 확인합니다.</li>
+        <li>터미널에서 예시 키를 디코딩합니다.</li>
+      </ol>
+      <pre>echo 'Z3Vlc3Rfbm90ZQ==' | base64 -d
+# guest_note</pre>
+      <ol start="4">
+        <li>숨겨진 객체 이름으로 <code>internal_backup</code>을 추측하고 Base64로 인코딩합니다.</li>
+      </ol>
+      <pre>echo -n 'internal_backup' | base64
+# aW50ZXJuYWxfYmFja3Vw</pre>
+      <ol start="5">
+        <li>존재 확인 API로 이 키가 있는지 확인합니다.</li>
+      </ol>
+      <pre>/api/share/check?key=aW50ZXJuYWxfYmFja3Vw</pre>
+      <ol start="6">
+        <li>200 OK가 나오면 아래 공유 링크를 엽니다.</li>
+      </ol>
+      <pre>/share/aW50ZXJuYWxfYmFja3Vw</pre>
+      <ol start="7">
+        <li>공유 노트 내용에 flag가 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{c7f_2nc0d3d_1D0r_3uCces2}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>서버가 "로그인했는가"만 확인하고 "이 note를 볼 수 있는 사람인가"를 확인하지 않기 때문입니다. 따라서 note_key만 맞히면 다른 사람 또는 내부용 공유 노트도 열 수 있습니다.</p>
+    </section>
+
+    <section id="upload">
+      <h2>5. File Upload</h2>
+      <table>
+        <tr><th>문제 목표</th><td>테마팩 ZIP 업로드로 내부 승인 파일을 만들고, 게시 과정에서 release token을 출력합니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>ZIP 엔트리 검증은 원본 파일명을 기준으로 하고, 실제 저장은 URL 디코딩과 경로 정규화 후 수행합니다.</td></tr>
+        <tr><th>취약 경로</th><td><code>%2e%2e/review/approval.json</code> → <code>../review/approval.json</code></td></tr>
+        <tr><th>승인 파일 내용</th><td><code>{"approved": true}</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 업로드 후 게시 조건을 봅니다.</strong> 테마 ZIP을 올리고 publish를 누르면 release token이 나오는 구조입니다. 따라서 flag가 나오는 조건은 publish 코드에 있을 가능성이 큽니다.</p>
+        <p><strong>게시 코드에서 내부 승인 파일을 찾습니다.</strong> <code>review/approval.json</code>이 있고 그 안의 <code>approved</code>가 <code>true</code>이면 <code>/flag.txt</code>를 읽습니다.</p>
+        <p><strong>그럼 목표는 review 폴더에 파일을 쓰는 것입니다.</strong> 사용자는 원래 <code>source</code> 안에 테마 파일만 올릴 수 있어야 합니다. 하지만 ZIP 내부 파일명 처리에 문제가 있으면 다른 폴더에 쓸 수 있습니다.</p>
+        <p><strong>검증과 저장의 차이를 봅니다.</strong> 검증은 원본 이름에서 <code>../</code>만 찾지만, 저장 단계는 먼저 URL 디코딩을 합니다. 그래서 <code>%2e%2e</code>가 검증 후에 <code>..</code>로 바뀝니다.</p>
+        <p><strong>최종 경로 검사가 root까지만 제한하는 것도 중요합니다.</strong> 파일이 theme root 밖으로 나가는지는 막지만, <code>source</code> 밖의 같은 theme root 안에 있는 <code>review</code> 폴더로 가는 것은 막지 못합니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>ZIP 업로드 문제에서는 압축 안의 파일명이 실제 저장 경로가 됩니다. 안전하게 만들려면 파일명을 디코딩하고 정규화한 뒤, 최종 저장 위치가 의도한 추출 폴더 안인지 확인해야 합니다.</p>
+      <p>이 문제는 검증할 때는 <code>%2e%2e/review/approval.json</code>을 그대로 보고, 저장할 때는 URL 디코딩해서 <code>../review/approval.json</code>으로 바꿉니다. 결과적으로 <code>source</code> 폴더에서 한 단계 올라가 <code>review</code> 폴더에 파일을 만들 수 있습니다.</p>
+
+      <h3>페이로드 ZIP 구조</h3>
+      <pre>manifest.json
+assets/preview.txt
+css/style.css
+%2e%2e/review/approval.json</pre>
+      <p><code>approval.json</code>의 내용은 아래와 같습니다.</p>
+      <pre>{"approved": true}</pre>
+
+      <h3>페이로드 파일 만들기</h3>
+      <p>현재 디렉토리에는 이미 <code>themedock_exploit.zip</code>이 있습니다. 새로 만들려면 아래 명령을 실행합니다.</p>
+      <pre>python3 -c 'import zipfile, json, pathlib; out=pathlib.Path("themedock_exploit.zip"); manifest={"name":"Approved Theme","description":"release metadata test","version":"1.0","entry":"assets/preview.txt"}; css=".theme-surface{padding:24px;color:#18212f;background:#fff}"; preview="approved release test"; z=zipfile.ZipFile(out,"w",zipfile.ZIP_DEFLATED); z.writestr("manifest.json",json.dumps(manifest)); z.writestr("assets/preview.txt",preview); z.writestr("css/style.css",css); z.writestr("%2e%2e/review/approval.json",json.dumps({"approved": True})); z.close(); print(out.resolve())'</pre>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>문제 서버의 메인 페이지에서 Theme Pack ZIP 업로드 폼을 엽니다.</li>
+        <li><code>themedock_exploit.zip</code>을 업로드합니다.</li>
+        <li>서버는 정상 테마 파일인 <code>manifest.json</code>, <code>assets/preview.txt</code>, <code>css/style.css</code>를 처리합니다.</li>
+        <li>동시에 <code>%2e%2e/review/approval.json</code> 엔트리가 URL 디코딩되어 <code>review/approval.json</code> 위치에 저장됩니다.</li>
+        <li>업로드 결과 페이지에서 preview를 열고 처리가 완료됐는지 확인합니다.</li>
+        <li>Publish 버튼을 누릅니다.</li>
+        <li>게시 페이지에 release token이 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{theme_pack_paths_change_after_normalization}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>문제의 flag 출력 조건은 "내부 승인 메타데이터가 있다"입니다. 직접 review 폴더에 접근할 수는 없지만, ZIP 엔트리 이름의 디코딩 타이밍 차이를 이용하면 업로드 과정에서 그 파일을 대신 만들 수 있습니다.</p>
+    </section>
+
+    <section>
+      <h2>방어 관점에서 기억할 점</h2>
+      <ul>
+        <li>Command Injection: 사용자 입력을 shell 문자열에 붙이지 말고, <code>subprocess.run(["nslookup", host], shell=False)</code>처럼 인자 배열로 실행해야 합니다.</li>
+        <li>SQL Injection: SQL은 문자열 조합이 아니라 파라미터 바인딩으로 실행해야 합니다.</li>
+        <li>SSTI: 사용자 입력을 템플릿 소스로 다시 렌더링하면 안 되며, 출력 데이터로만 다뤄야 합니다.</li>
+        <li>IDOR: Base64나 난독화는 권한 검사가 아니며, 객체 조회 전 소유권 또는 공유 권한을 확인해야 합니다.</li>
+        <li>File Upload: 파일명은 모든 디코딩과 정규화를 먼저 끝낸 뒤 검증해야 하고, 최종 경로는 반드시 의도된 추출 디렉토리 안으로 제한해야 합니다.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

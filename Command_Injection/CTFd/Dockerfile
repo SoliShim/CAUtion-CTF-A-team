@@ -13,6 +13,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 5. 나머지 모든 문제 파일(app.py, templates 등) 복사
 COPY . .
 
+RUN adduser --disabled-password --gecos "" command \
+    && mkdir -p reports \
+    && chown -R root:root /app \
+    && chown -R command:command /app/reports \
+    && chmod 755 /app \
+    && chmod 644 /app/flag.txt
+
 # 6. Flask가 사용할 포트 번호 (기본 80번)
 EXPOSE 80
 

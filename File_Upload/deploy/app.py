@@ -3,14 +3,17 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 import os
 import json
+import re
+import secrets
 
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+UPLOAD_ROOT = os.path.join(BASE_DIR, "uploads")
+CLIENT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_ROOT, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 
@@ -48,6 +51,39 @@ def extract_json_from_file(path):
     return json.loads(raw[start:end + 1])
 
 
+def get_upload_client_id():
+    client_id = session.get("_upload_client_id")
+
+    if not client_id or not CLIENT_ID_PATTERN.fullmatch(client_id):
+        client_id = secrets.token_urlsafe(18)
+        session["_upload_client_id"] = client_id
+
+    return client_id
+
+
+def get_upload_folder(client_id=None):
+    if client_id is None:
+        client_id = get_upload_client_id()
+
+    upload_folder = os.path.join(UPLOAD_ROOT, client_id)
+    os.makedirs(upload_folder, exist_ok=True)
+    return upload_folder
+
+
+def resolve_admin_target(filename):
+    normalized = os.path.normpath(filename)
+
+    if normalized == "uploads":
+        return get_upload_folder()
+
+    upload_prefix = "uploads" + os.sep
+    if normalized.startswith(upload_prefix):
+        relative_name = normalized[len(upload_prefix):]
+        return os.path.join(get_upload_folder(), relative_name)
+
+    return os.path.join(BASE_DIR, filename)
+
+
 def status_page(title, message, variant="info", action_href="/", action_label="Back"):
     return render_template(
         "status.html",
@@ -67,11 +103,14 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     session["is_admin"] = False
+    get_upload_client_id()
     return redirect("/upload")
 
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
+    client_id = get_upload_client_id()
+
     if request.method == "POST":
         file = request.files.get("file")
 
@@ -113,7 +152,7 @@ def upload():
                 "업로드로 돌아가기",
             )
 
-        save_path = os.path.join(UPLOAD_FOLDER, filename)
+        save_path = os.path.join(get_upload_folder(client_id), filename)
         file.save(save_path)
 
         try:
@@ -121,6 +160,7 @@ def upload():
 
             if isinstance(data, dict):
                 session.update(data)
+                session["_upload_client_id"] = client_id
 
         except Exception:
             pass
@@ -152,7 +192,7 @@ def admin():
     if not filename:
         return render_template("admin.html")
 
-    target = os.path.join(BASE_DIR, filename)
+    target = resolve_admin_target(filename)
 
     try:
         with open(target, "r", encoding="utf-8") as f:

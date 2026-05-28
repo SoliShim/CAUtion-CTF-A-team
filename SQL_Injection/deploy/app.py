@@ -26,12 +26,10 @@ def init_db():
     conn = sqlite3.connect('sqli.db')
     c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS user_table (uid TEXT, upw TEXT)')
-    
-    c.execute('SELECT count(*) FROM user_table')
-    if c.fetchone()[0] == 0:
-        c.execute(f"INSERT INTO user_table (uid, upw) VALUES ('admin', '{REAL_FLAG}')")
-        c.execute("INSERT INTO user_table (uid, upw) VALUES ('guest', 'guest')")
-        conn.commit()
+    c.execute("DELETE FROM user_table WHERE uid IN ('admin', 'guest')")
+    c.execute("INSERT INTO user_table (uid, upw) VALUES ('admin', ?)", (REAL_FLAG,))
+    c.execute("INSERT INTO user_table (uid, upw) VALUES ('guest', 'guest')")
+    conn.commit()
     conn.close()
 
 init_db()

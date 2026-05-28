@@ -70,6 +70,16 @@ print_row() {
   printf '%-19s %-14s %-18s %s\n' "$1" "$2" "$3" "$4"
 }
 
+print_docker_info_error() {
+  local error_text="$1"
+
+  echo "$error_text" \
+    | sed -E 's/[[:space:]]+/ /g' \
+    | sed '/^$/d' \
+    | head -n 3 \
+    | sed 's/^/  /'
+}
+
 echo "CAUtion CTF server status"
 echo "Checked at: $(date '+%Y-%m-%d %H:%M:%S %Z')"
 echo
@@ -85,9 +95,30 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! docker info >/dev/null 2>&1; then
-  echo "Docker: not running"
-  echo "Open Docker Desktop, wait until it is ready, then try again."
+docker_info_output="$(docker info 2>&1 >/dev/null)"
+docker_info_status=$?
+if [ "$docker_info_status" -ne 0 ]; then
+  case "$docker_info_output" in
+    *"permission denied"*|*"Permission denied"*)
+      echo "Docker: access denied"
+      echo "Docker Desktop may be running, but this shell cannot access the Docker API."
+      echo "If this is running inside Codex or another sandbox, allow Docker access or run the script in a normal terminal."
+      echo "Docker error:"
+      print_docker_info_error "$docker_info_output"
+      ;;
+    *"Cannot connect to the Docker daemon"*|*"Is the docker daemon running"*|*"docker daemon is not running"*)
+      echo "Docker: not running"
+      echo "Open Docker Desktop, wait until it is ready, then try again."
+      echo "Docker error:"
+      print_docker_info_error "$docker_info_output"
+      ;;
+    *)
+      echo "Docker: unavailable"
+      echo "Docker exists, but the status check could not talk to the Docker API."
+      echo "Docker error:"
+      print_docker_info_error "$docker_info_output"
+      ;;
+  esac
   exit 1
 fi
 

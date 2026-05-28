@@ -18,6 +18,8 @@ app.secret_key = os.urandom(32)
 PORT = 8000
 BASE_URL = f"http://127.0.0.1:{PORT}"
 FLAG_PRICE = 2_147_483_647
+FLAG_CLIENT_COOKIE = "flag_client_id"
+FLAG_CLIENT_COOKIE_MAX_AGE = 60 * 60 * 6
 
 FLAG = os.environ.get("FLAG")
 if FLAG is None:
@@ -56,7 +58,9 @@ users = {
 session_storage = {}
 token_storage = {}
 problem_storage = {}
-purchased_users = set()
+session_account_storage = {}
+admin_target_storage = {}
+purchased_sessions = set()
 flag_in_flight = set()
 
 
@@ -72,7 +76,12 @@ def generate_problem():
         answer = a * b
     return {"a": a, "b": b, "op": op, "answer": answer}
 
-def read_url(url, cookie={"name": "name", "value": "value"}):
+def read_url(url, target_session_id=None, cookie=None):
+    if cookie is None:
+        cookie = {"name": "name", "value": "value"}
+    else:
+        cookie = dict(cookie)
+
     cookie.update({"domain": "127.0.0.1"})
     service = Service(executable_path="/usr/bin/chromedriver")
     options = webdriver.ChromeOptions()
@@ -93,7 +102,7 @@ def read_url(url, cookie={"name": "name", "value": "value"}):
         driver = webdriver.Chrome(service=service, options=options)
         driver.set_page_load_timeout(10)
 
-        session_id = create_session("admin", "127.0.0.1")
+        session_id = create_session("admin", "127.0.0.1", target_session_id)
         driver.get("http://127.0.0.1:8000/")
         driver.add_cookie(cookie)
         driver.add_cookie({"name": "sessionid", "value": session_id, "domain": "127.0.0.1"})
@@ -114,26 +123,42 @@ def read_url(url, cookie={"name": "name", "value": "value"}):
     driver.quit()
     return True
 
-def check_csrf(param, cookie={"name": "name", "value": "value"}):
+def check_csrf(param, target_session_id=None, cookie=None):
     url = f"http://127.0.0.1:8000/vuln?param={urllib.parse.quote(param)}"
-    return read_url(url, cookie)
+    return read_url(url, target_session_id, cookie)
 
-def create_session(username, remote_addr):
+def create_session(username, remote_addr, target_session_id=None):
     session_id = os.urandom(8).hex()
     session_storage[session_id] = username
     token_storage[session_id] = md5((username + remote_addr).encode()).hexdigest()
+    if target_session_id is not None:
+        admin_target_storage[session_id] = target_session_id
+    session_account_storage[session_id] = dict(users[username])
     return session_id
 
+def get_session_id():
+    return request.cookies.get("sessionid")
+
 def get_username():
-    session_id = request.cookies.get("sessionid")
+    session_id = get_session_id()
 
     if session_id is None:
         return None
 
     return session_storage.get(session_id)
 
+def get_user_data(session_id=None):
+    if session_id is None:
+        session_id = get_session_id()
+
+    username = session_storage.get(session_id)
+    if username is None:
+        return None
+
+    return session_account_storage.setdefault(session_id, dict(users[username]))
+
 def get_csrf_token():
-    session_id = request.cookies.get("sessionid")
+    session_id = get_session_id()
 
     if session_id is None:
         return None
@@ -149,10 +174,31 @@ def login_required():
     return username
 
 
+def get_flag_client_id():
+    client_id = request.cookies.get(FLAG_CLIENT_COOKIE)
+    if client_id:
+        return client_id, False
+
+    return secrets.token_urlsafe(16), True
+
+
+def flag_response(client_id, message=None):
+    resp = make_response(render_template("flag.html", base_url=BASE_URL, message=message))
+    resp.set_cookie(
+        FLAG_CLIENT_COOKIE,
+        client_id,
+        max_age=FLAG_CLIENT_COOKIE_MAX_AGE,
+        httponly=True,
+        samesite="Lax",
+    )
+    return resp
+
+
 @app.context_processor
 def inject_user():
     username = get_username()
-    money = users[username]["money"] if username and username in users else None
+    user_data = get_user_data()
+    money = user_data["money"] if user_data else None
     return {"current_user": username, "current_money": money}
 
 
@@ -162,11 +208,14 @@ def index():
 
 @app.route("/logout")
 def logout():
-    session_id = request.cookies.get("sessionid")
+    session_id = get_session_id()
     if session_id:
         session_storage.pop(session_id, None)
         token_storage.pop(session_id, None)
         problem_storage.pop(session_id, None)
+        session_account_storage.pop(session_id, None)
+        admin_target_storage.pop(session_id, None)
+        purchased_sessions.discard(session_id)
     resp = make_response(redirect(url_for("index")))
     resp.set_cookie("sessionid", "", expires=0)
     return resp
@@ -178,24 +227,26 @@ def vuln():
 
 @app.route("/flag", methods=["GET", "POST"])
 def flag():
+    client_id, _ = get_flag_client_id()
+
     if request.method == "GET":
-        return render_template("flag.html", base_url=BASE_URL)
+        return flag_response(client_id)
     elif request.method == "POST":
-        session_id = request.cookies.get("sessionid") or request.remote_addr
-        if session_id in flag_in_flight:
-            return render_template("flag.html", base_url=BASE_URL, message=("error", "이전 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."))
-        flag_in_flight.add(session_id)
+        if client_id in flag_in_flight:
+            return flag_response(client_id, ("error", "이전 요청을 처리 중입니다. 잠시 후 다시 시도해주세요."))
+        flag_in_flight.add(client_id)
         try:
             param = request.form.get("param", "")
+            participant_session_id = get_session_id()
             try:
-                result = check_csrf(param)
+                result = check_csrf(param, participant_session_id)
             except Exception:
                 result = False
             if not result:
-                return render_template("flag.html", base_url=BASE_URL, message=("error", "잘못된 payload입니다."))
-            return render_template("flag.html", base_url=BASE_URL, message=("success", "payload가 전송되었습니다."))
+                return flag_response(client_id, ("error", "잘못된 payload입니다."))
+            return flag_response(client_id, ("success", "payload가 전송되었습니다."))
         finally:
-            flag_in_flight.discard(session_id)
+            flag_in_flight.discard(client_id)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -218,11 +269,13 @@ def login():
 @app.route("/shop", methods=["GET", "POST"])
 def shop():
     username = login_required()
+    session_id = get_session_id()
+    user_data = get_user_data(session_id)
 
-    if username is None:
+    if username is None or user_data is None:
         return render_template("shop.html", price=FLAG_PRICE, text="please login")
 
-    already_purchased = username in purchased_users
+    already_purchased = session_id in purchased_sessions
 
     if request.method == "GET":
         return render_template(
@@ -240,15 +293,15 @@ def shop():
             purchased=True,
         )
 
-    if users[username]["money"] < FLAG_PRICE:
+    if user_data["money"] < FLAG_PRICE:
         return render_template(
             "shop.html",
             price=FLAG_PRICE,
             text="잔액이 부족합니다.",
         )
 
-    users[username]["money"] -= FLAG_PRICE
-    purchased_users.add(username)
+    user_data["money"] -= FLAG_PRICE
+    purchased_sessions.add(session_id)
 
     return render_template(
         "shop.html",
@@ -261,11 +314,12 @@ def shop():
 @app.route("/game", methods=["GET", "POST"])
 def game():
     username = login_required()
+    session_id = get_session_id()
+    user_data = get_user_data(session_id)
 
-    if username is None:
+    if username is None or user_data is None:
         return render_template("game.html", text="please login")
 
-    session_id = request.cookies.get("sessionid")
     message = None
 
     if request.method == "POST":
@@ -279,7 +333,7 @@ def game():
             current = generate_problem()
 
         if user_answer == current["answer"]:
-            users[username]["money"] += 1
+            user_data["money"] += 1
             message = ("success", "정답입니다! +1원")
         else:
             message = ("error", f"오답입니다. 정답은 {current['answer']} 였습니다.")
@@ -295,8 +349,14 @@ def game():
 
 @app.route("/rank")
 def rank():
+    session_id = get_session_id()
+    ranking_users = {name: dict(data) for name, data in users.items()}
+    username = session_storage.get(session_id)
+    if username in ranking_users and session_id in session_account_storage:
+        ranking_users[username] = session_account_storage[session_id]
+
     ranking = sorted(
-        users.items(),
+        ranking_users.items(),
         key=lambda item: item[1]["money"],
         reverse=True
     )
@@ -316,7 +376,7 @@ def rank():
     
 @app.route("/transfer", methods=["GET", "POST"])
 def transfer():
-    session_id = request.cookies.get('sessionid', None)
+    session_id = get_session_id()
     try:
         username = session_storage[session_id]
         csrf_token = token_storage[session_id]
@@ -335,7 +395,23 @@ def transfer():
         if form_token != csrf_token:
             return err("유효하지 않은 요청입니다.")
 
-        if to not in users:
+        sender_data = get_user_data(session_id)
+        if sender_data is None:
+            return err("존재하지 않는 사용자입니다.")
+
+        recipient_session_id = None
+        if to == "guest" and username == "admin":
+            recipient_session_id = admin_target_storage.get(session_id)
+
+        if recipient_session_id is not None:
+            recipient_data = get_user_data(recipient_session_id)
+            if recipient_data is None:
+                return err("존재하지 않는 사용자입니다.")
+        elif to == username:
+            recipient_data = sender_data
+        elif to in users:
+            recipient_data = dict(users[to])
+        else:
             return err("존재하지 않는 사용자입니다.")
 
         try:
@@ -346,11 +422,11 @@ def transfer():
         if amount <= 0:
             return err("금액은 1 이상이어야 합니다.")
 
-        if users[username]["money"] < amount:
+        if sender_data["money"] < amount:
             return err("잔액이 부족합니다.")
 
-        users[username]["money"] -= amount
-        users[to]["money"] += amount
+        sender_data["money"] -= amount
+        recipient_data["money"] += amount
 
         return render_template("transfer.html", csrf_token=csrf_token, text_success="송금이 완료되었습니다.")
         

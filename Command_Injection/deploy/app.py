@@ -1,16 +1,27 @@
 import os
+import pwd
 import re
+import secrets
 import subprocess
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-REPORT_DIR = os.path.join(BASE_DIR, "reports")
+REPORT_ROOT = os.path.join(BASE_DIR, "reports")
 FLAG_PATH = os.path.join(BASE_DIR, "flag.txt")
 SAFE_FILENAME_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
+CLIENT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{16,64}$")
+COMMAND_USER = os.environ.get("COMMAND_USER", "command")
+SAMPLE_FILES = {
+    "notice.txt": "Only report files can be inspected from this page.\n",
+    "health.log": "web=ok db=ok cache=ok\n",
+    "backup.log": "daily backup completed\n",
+    "result.txt": "No saved command output yet.\n",
+}
 
 
 def load_flag():
@@ -28,21 +39,39 @@ def load_flag():
 FLAG = load_flag()
 
 
-def init_challenge_files():
-    os.makedirs(REPORT_DIR, exist_ok=True)
+def ensure_report_files(report_dir):
+    os.makedirs(report_dir, exist_ok=True)
 
-    sample_files = {
-        "notice.txt": "Only report files can be inspected from this page.\n",
-        "health.log": "web=ok db=ok cache=ok\n",
-        "backup.log": "daily backup completed\n",
-        "result.txt": "No saved command output yet.\n",
-    }
-
-    for filename, content in sample_files.items():
-        path = os.path.join(REPORT_DIR, filename)
+    for filename, content in SAMPLE_FILES.items():
+        path = os.path.join(report_dir, filename)
         if not os.path.exists(path):
             with open(path, "w", encoding="utf-8") as file:
                 file.write(content)
+
+    try:
+        user_info = pwd.getpwnam(COMMAND_USER)
+        os.chown(os.path.dirname(report_dir), user_info.pw_uid, user_info.pw_gid)
+        os.chown(report_dir, user_info.pw_uid, user_info.pw_gid)
+        for filename in SAMPLE_FILES:
+            os.chown(os.path.join(report_dir, filename), user_info.pw_uid, user_info.pw_gid)
+    except (KeyError, PermissionError, OSError):
+        pass
+
+
+def get_client_report_dir():
+    client_id = session.get("client_id")
+
+    if not client_id or not CLIENT_ID_PATTERN.fullmatch(client_id):
+        client_id = secrets.token_urlsafe(18)
+        session["client_id"] = client_id
+
+    report_dir = os.path.join(REPORT_ROOT, client_id, "reports")
+    ensure_report_files(report_dir)
+    return report_dir
+
+
+def init_challenge_files():
+    os.makedirs(REPORT_ROOT, exist_ok=True)
 
     if os.environ.get("FLAG") or not os.path.exists(FLAG_PATH):
         with open(FLAG_PATH, "w", encoding="utf-8") as file:
@@ -75,6 +104,7 @@ def index():
     error = None
     status = None
     filename = "notice.txt"
+    report_dir = get_client_report_dir()
 
     if request.method == "POST":
         filename = request.form.get("filename", "")
@@ -83,16 +113,18 @@ def index():
         if not passed:
             error = message
         else:
-            command = f"head -n 20 {REPORT_DIR}/{filename}"
+            command = f"head -n 20 {report_dir}/{filename}"
 
             try:
                 completed = subprocess.run(
                     command,
                     shell=True,
+                    cwd=os.path.dirname(report_dir),
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
                     timeout=3,
+                    user=COMMAND_USER,
                 )
 
                 if is_safe_report_name(filename):

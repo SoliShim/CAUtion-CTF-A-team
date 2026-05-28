@@ -147,6 +147,8 @@ CTFd 배포용 폴더와 zip을 다시 만들려면 아래 명령어를 실행�
 ./scripts/check_server_status.sh
 ```
 
+`Docker: access denied`가 나오면 Docker Desktop이 꺼진 뜻이 아니라, 현재 터미널이나 샌드박스가 Docker API에 접근하지 못한다는 뜻입니다. 일반 터미널에서 다시 실행하거나 해당 실행 환경에 Docker 접근 권한을 허용하세요.
+
 서버 상태를 계속 감시하면서 맥이 절전모드에 들어가지 않게 유지:
 
 ```bash
@@ -165,6 +167,12 @@ CTFd 배포용 폴더와 zip을 다시 만들려면 아래 명령어를 실행�
 ./scripts/update_ctfd_challenge_links.sh
 ```
 
+CTFd에 쓰기 전에 현재 터널 주소만 확인:
+
+```bash
+./scripts/update_ctfd_challenge_links.sh --links-only
+```
+
 이 스크립트는 CTFd의 B조 5문제를 찾아 각 문제 Message를 아래 형식으로 바꿉니다.
 
 ```text
@@ -178,6 +186,8 @@ CTFd 접속 정보는 실행할 때 입력하거나, 추적되지 않는 로컬 
 ```bash
 cp .env.ctfd.local.example .env.ctfd.local
 ```
+
+자동 실행이나 비대화형 터미널에서 사용할 때는 `.env.ctfd.local`에 `CTFD_TOKEN` 또는 `CTFD_PASSWORD`를 넣어야 합니다. 스크립트는 Docker 로그에서 현재 터널 URL을 직접 읽으며, Docker 접근 권한이 없으면 낡은 링크 파일로 조용히 진행하지 않고 실패합니다.
 
 서버 실행, 상태 확인, CTFd Message 업데이트를 한 번에 실행:
 

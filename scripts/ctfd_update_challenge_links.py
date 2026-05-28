@@ -110,7 +110,15 @@ class CTFdClient:
                 content_type = resp.headers.get("Content-Type", "")
                 if "application/json" in content_type:
                     return json.loads(raw.decode("utf-8"))
-                return raw.decode("utf-8", errors="replace")
+                text = raw.decode("utf-8", errors="replace")
+                if path.startswith("/api/"):
+                    raise RuntimeError(
+                        f"{method} {path} expected JSON but got "
+                        f"{content_type or 'unknown content type'}. "
+                        "CTFd authentication may have failed or the account may not "
+                        f"have admin access. Response: {shorten(text)}"
+                    )
+                return text
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
             raise RuntimeError(
@@ -156,9 +164,12 @@ class CTFdClient:
 
         admin_page = self.get_text("/admin/challenges")
         self.csrf_nonce = extract_nonce(admin_page) or self.csrf_nonce
-        if "admin/challenges" not in admin_page and "Challenges" not in admin_page:
+        if looks_like_login_page(admin_page):
             if "incorrect" in body.lower() or "invalid" in body.lower():
                 raise RuntimeError("CTFd login failed")
+            raise RuntimeError(
+                "CTFd login failed or the account does not have admin access"
+            )
 
     def list_challenges(self):
         data = self.request("GET", "/api/v1/challenges?view=admin")
@@ -200,6 +211,16 @@ def extract_nonce(page):
     return None
 
 
+def looks_like_login_page(page):
+    lower = page.lower()
+    return (
+        "<h1" in lower
+        and "login" in lower
+        and 'name="password"' in lower
+        and 'name="nonce"' in lower
+    ) or "userId': 0" in page or '"userId": 0' in page
+
+
 def compose_cmd():
     cmd = ["docker", "compose"]
     if ENV_FILE.exists():
@@ -220,7 +241,13 @@ def tunnel_url_from_logs(service):
             text=True,
         )
     except FileNotFoundError:
-        return None
+        raise RuntimeError("docker command was not found")
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Could not read Docker logs for {service}. "
+            "Run this script in a terminal that can access Docker, then try again."
+        )
 
     matches = re.findall(r"https://[-a-zA-Z0-9.]+\.trycloudflare\.com", result.stdout)
     return matches[-1] if matches else None
@@ -228,20 +255,33 @@ def tunnel_url_from_logs(service):
 
 def tunnel_urls_from_html():
     if not LINKS_HTML.exists():
-        return []
+        return {}
     text = LINKS_HTML.read_text(encoding="utf-8", errors="replace")
-    return re.findall(r"https://[-a-zA-Z0-9.]+\.trycloudflare\.com", text)
+    urls = {}
+    for challenge in CHALLENGES:
+        label = re.escape(challenge["label"])
+        match = re.search(
+            rf"<td>\s*{label}\s*</td>\s*<td>\s*<a[^>]+href=\"(https://[-a-zA-Z0-9.]+\.trycloudflare\.com)\"",
+            text,
+            re.IGNORECASE,
+        )
+        if match:
+            urls[challenge["label"]] = html.unescape(match.group(1))
+    return urls
 
 
-def collect_tunnel_urls():
+def collect_tunnel_urls(allow_html_fallback=False):
     urls = {}
     html_urls = tunnel_urls_from_html()
-    html_index = 0
     for challenge in CHALLENGES:
-        url = tunnel_url_from_logs(challenge["service"])
-        if not url and html_index < len(html_urls):
-            url = html_urls[html_index]
-            html_index += 1
+        try:
+            url = tunnel_url_from_logs(challenge["service"])
+        except RuntimeError:
+            if not allow_html_fallback:
+                raise
+            url = None
+        if not url and allow_html_fallback:
+            url = html_urls.get(challenge["label"])
         urls[challenge["label"]] = url
     return urls
 
@@ -320,6 +360,16 @@ def parse_args():
     parser.add_argument("--password", default=None, help="CTFd admin password")
     parser.add_argument("--token", default=None, help="CTFd access token")
     parser.add_argument("--dry-run", action="store_true", help="Print updates only")
+    parser.add_argument(
+        "--links-only",
+        action="store_true",
+        help="Print current tunnel URLs and exit before connecting to CTFd",
+    )
+    parser.add_argument(
+        "--allow-html-fallback",
+        action="store_true",
+        help="Use ctf_tunnel_links.html if Docker logs do not contain a tunnel URL",
+    )
     return parser.parse_args()
 
 
@@ -330,16 +380,41 @@ def main():
     password = env_or_arg(args.password, "CTFD_PASSWORD")
     token = env_or_arg(args.token, "CTFD_TOKEN")
 
-    tunnel_urls = collect_tunnel_urls()
+    try:
+        tunnel_urls = collect_tunnel_urls(args.allow_html_fallback)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
     missing_urls = [label for label, url in tunnel_urls.items() if not url]
     if missing_urls:
         print("Missing tunnel URL(s): " + ", ".join(missing_urls), file=sys.stderr)
         print("Run ./scripts/start_free_tunnels.sh first.", file=sys.stderr)
+        if not args.allow_html_fallback:
+            print(
+                "If you intentionally want to use ctf_tunnel_links.html instead "
+                "of current Docker logs, add --allow-html-fallback.",
+                file=sys.stderr,
+            )
         return 1
+
+    if args.links_only:
+        for problem in CHALLENGES:
+            label = problem["label"]
+            print(f"{label}: {tunnel_urls[label]}")
+        return 0
 
     client = CTFdClient(base_url, token=token)
     if not token:
         if not password:
+            if not sys.stdin.isatty():
+                print(
+                    "Missing CTFd credentials. Set CTFD_TOKEN or CTFD_PASSWORD "
+                    "in .env.ctfd.local, or run this command in an interactive "
+                    "terminal so it can ask for the password.",
+                    file=sys.stderr,
+                )
+                return 1
             password = getpass.getpass(f"CTFd password for {username}: ")
         client.login(username, password)
 
@@ -370,10 +445,19 @@ def main():
         current = client.get_challenge(target["id"])
         payload = build_patch_payload(current, description)
         client.patch_challenge(target["id"], payload)
+        verified = client.get_challenge(target["id"])
+        if verified.get("description") != description:
+            raise RuntimeError(
+                f"Updated {label}, but read-back verification did not match"
+            )
         print("updated")
 
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except RuntimeError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        raise SystemExit(1)

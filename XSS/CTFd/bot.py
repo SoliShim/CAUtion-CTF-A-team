@@ -8,7 +8,7 @@ import os
 BASE_URL = os.environ.get("BASE_URL", "http://127.0.0.1:80")
 
 
-def visit_ticket(ticket_id):
+def visit_ticket(ticket_id, collector_id=None):
 
     options = Options()
 
@@ -34,6 +34,12 @@ def visit_ticket(ticket_id):
     try:
         driver.get(BASE_URL + "/admin/login")
         time.sleep(1)
+        if collector_id:
+            driver.add_cookie({
+                "name": "xss_client_id",
+                "value": collector_id,
+                "path": "/",
+            })
 
         driver.get(BASE_URL + f"/admin/ticket/{ticket_id}")
         time.sleep(5)
